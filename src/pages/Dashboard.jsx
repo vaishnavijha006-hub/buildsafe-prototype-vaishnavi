@@ -87,6 +87,9 @@ export default function Dashboard({ view }) {
     return projects[0]?.id || "";
   });
 
+  const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
+  const project = projects.find((p) => p.id === worker?.projectId);
+
   useEffect(() => {
     localStorage.setItem("buildsafe_workers", JSON.stringify(workers));
   }, [workers]);
@@ -204,9 +207,6 @@ export default function Dashboard({ view }) {
     }
   }, [chain, worker, lastPayout]);
 
-  const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
-  const project = projects.find((p) => p.id === worker?.projectId);
-
   const syncLedgerToNotion = async (updatedChain) => {
     if (!notionStatus.connected) return;
     const latest = updatedChain[updatedChain.length - 1];
@@ -220,6 +220,7 @@ export default function Dashboard({ view }) {
   };
 
   const handleScanComplete = async () => {
+    if (!worker) return;
     const updated = await appendToChain(chain, "ATTENDANCE", {
       workerId: worker.id,
       workerName: worker.name,
@@ -233,6 +234,7 @@ export default function Dashboard({ view }) {
   };
 
   const handleClaimWage = () => {
+    if (!worker) return;
     setGateStatus("checking");
     setTimeout(async () => {
       const payoutsToday = chain.filter(
@@ -280,6 +282,7 @@ export default function Dashboard({ view }) {
   };
 
   const handleRaiseDispute = async (reason) => {
+    if (!worker) return;
     const updated = await raiseDispute(chain, {
       workerId: worker.id,
       workerName: worker.name,
@@ -365,7 +368,7 @@ export default function Dashboard({ view }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {notionStatus.connected && (
+            {notionStatus?.connected && (
               <a
                 href={notionStatus.workspaceUrl || "https://notion.so"}
                 target="_blank"
@@ -389,10 +392,10 @@ export default function Dashboard({ view }) {
               <Languages size={11} className="text-safety" /> {lang === "en" ? "हिंदी" : "English"}
             </button>
             <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[120px]">
-              {user.name}
+              {user?.name}
             </span>
             <div className="flex bg-bitumen2 rounded-full p-1 gap-1">
-              {user.role === "worker" ? (
+              {user?.role === "worker" ? (
                 <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
                   <HardHat size={14} /> Worker
                 </span>
@@ -427,21 +430,31 @@ export default function Dashboard({ view }) {
 
       <main className="px-4 py-8">
         {view === "worker" ? (
-          <WorkerView
-            key={worker?.id}
-            worker={worker}
-            workers={workers}
-            project={project}
-            chain={chain}
-            lang={lang}
-            onSwitchWorker={handleSwitchWorker}
-            onScanComplete={handleScanComplete}
-            onClaimWage={handleClaimWage}
-            lastPayout={lastPayout}
-            policyResult={policyResult}
-            onRaiseDispute={handleRaiseDispute}
-            openDisputeForWorker={openDisputeForWorker}
-          />
+          worker ? (
+            <WorkerView
+              key={worker?.id}
+              worker={worker}
+              workers={workers}
+              project={project}
+              chain={chain}
+              lang={lang}
+              onSwitchWorker={handleSwitchWorker}
+              onScanComplete={handleScanComplete}
+              onClaimWage={handleClaimWage}
+              lastPayout={lastPayout}
+              policyResult={policyResult}
+              onRaiseDispute={handleRaiseDispute}
+              openDisputeForWorker={openDisputeForWorker}
+            />
+          ) : (
+            <div className="max-w-5xl mx-auto text-center bg-white rounded-2xl border-2 border-bitumen/10 p-10">
+              <HardHat size={28} className="text-steel mx-auto mb-3" />
+              <p className="font-display text-base text-bitumen">No worker data found</p>
+              <p className="text-sm text-steel mt-1">
+                We couldn't load your worker profile. Try signing out and back in.
+              </p>
+            </div>
+          )
         ) : (
           <ContractorView
             chain={chain}
