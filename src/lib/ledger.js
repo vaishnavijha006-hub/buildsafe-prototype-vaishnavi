@@ -108,6 +108,20 @@ export function genWorkerId() {
   return `BSW-${n}`;
 }
 
+// Writes a worker's onboarding to the chain — the moment a Digital
+// Worker ID is issued. This is the literal "Worker completes
+// onboarding and gets a digital ID" step from the pitch, made visible
+// in the ledger rather than just a row in a database.
+export async function appendOnboarding(chain, { workerId, workerName, role, projectId, dailyWage }) {
+  return appendToChain(chain, "WORKER_ONBOARDED", {
+    workerId,
+    workerName,
+    role,
+    projectId,
+    dailyWage,
+  });
+}
+
 export function genTxnId() {
   return `UPI${Date.now().toString().slice(-8)}${Math.floor(Math.random() * 900 + 100)}`;
 }

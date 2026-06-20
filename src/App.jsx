@@ -3,8 +3,8 @@ import { HardHat, LayoutDashboard, ShieldCheck } from "lucide-react";
 import WorkerView from "./components/WorkerView";
 import ContractorView from "./components/ContractorView";
 import ArmorPayGate from "./components/ArmorPayGate";
-import { appendToChain, armorPayPolicyCheck, genTxnId, raiseDispute, resolveDispute, getOpenDisputes } from "./lib/ledger";
-import { WORKERS, PROJECTS, getWorkerById } from "./lib/seedData";
+import { appendToChain, armorPayPolicyCheck, genTxnId, raiseDispute, resolveDispute, getOpenDisputes, genWorkerId, appendOnboarding } from "./lib/ledger";
+import { WORKERS, PROJECTS } from "./lib/seedData";
 
 export default function App() {
   const [view, setView] = useState("worker");
@@ -17,8 +17,9 @@ export default function App() {
   const [activeWorkerId, setActiveWorkerId] = useState(WORKERS[0].id);
   const [activeProjectId, setActiveProjectId] = useState(PROJECTS[0].id);
   const [projects, setProjects] = useState(PROJECTS);
+  const [workers, setWorkers] = useState(WORKERS);
 
-  const worker = getWorkerById(activeWorkerId);
+  const worker = workers.find((w) => w.id === activeWorkerId);
   const project = projects.find((p) => p.id === worker.projectId);
 
   const handleSwitchWorker = (id) => {
@@ -106,6 +107,28 @@ export default function App() {
     setActiveProjectId(id);
   };
 
+  const handleAddWorker = async (name, role, dailyWage, projectId) => {
+    const id = genWorkerId();
+    const newWorker = {
+      id,
+      name,
+      role,
+      projectId,
+      dailyWage,
+      phone: "—",
+      joinedOn: new Date().toISOString().slice(0, 10),
+    };
+    setWorkers((prev) => [...prev, newWorker]);
+    const updated = await appendOnboarding(chain, {
+      workerId: id,
+      workerName: name,
+      role,
+      projectId,
+      dailyWage,
+    });
+    setChain(updated);
+  };
+
   const openDisputeForWorker = (workerId) => getOpenDisputes(chain).some((d) => d.data.workerId === workerId);
 
   return (
@@ -153,7 +176,7 @@ export default function App() {
           <WorkerView
             key={worker.id}
             worker={worker}
-            workers={WORKERS}
+            workers={workers}
             project={project}
             chain={chain}
             onSwitchWorker={handleSwitchWorker}
@@ -167,13 +190,14 @@ export default function App() {
         ) : (
           <ContractorView
             chain={chain}
-            workers={WORKERS}
+            workers={workers}
             projects={projects}
             activeProjectId={activeProjectId}
             onSwitchProject={setActiveProjectId}
             onTamperDemo={handleTamperDemo}
             onResolveDispute={handleResolveDispute}
             onCreateProject={handleCreateProject}
+            onAddWorker={handleAddWorker}
           />
         )}
       </main>

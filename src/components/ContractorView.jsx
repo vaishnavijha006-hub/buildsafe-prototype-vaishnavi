@@ -13,6 +13,7 @@ function BlockCard({ block }) {
     DISPUTE_RAISED: "border-rust",
     DISPUTE_RESOLVED: "border-steel",
     PROJECT_CREATED: "border-steel",
+    WORKER_ONBOARDED: "border-tarp",
   };
   const typeLabelMap = {
     PAYOUT: "WAGE PAYOUT",
@@ -20,6 +21,7 @@ function BlockCard({ block }) {
     DISPUTE_RAISED: "DISPUTE RAISED",
     DISPUTE_RESOLVED: "DISPUTE RESOLVED",
     PROJECT_CREATED: "PROJECT EVENT",
+    WORKER_ONBOARDED: "WORKER ONBOARDED",
   };
   const typeColor = typeColorMap[block.type] || "border-steel";
   const typeLabel = typeLabelMap[block.type] || block.type;
@@ -97,12 +99,16 @@ function DisputeCard({ dispute, onResolve }) {
 
 export default function ContractorView({
   chain, workers, projects, activeProjectId, onSwitchProject,
-  onTamperDemo, onResolveDispute, onCreateProject,
+  onTamperDemo, onResolveDispute, onCreateProject, onAddWorker,
 }) {
   const [chainStatus, setChainStatus] = useState(null);
   const [showNewProject, setShowNewProject] = useState(false);
   const [newName, setNewName] = useState("");
   const [newWage, setNewWage] = useState("");
+  const [showNewWorker, setShowNewWorker] = useState(false);
+  const [workerName, setWorkerName] = useState("");
+  const [workerRole, setWorkerRole] = useState("");
+  const [workerWage, setWorkerWage] = useState("");
 
   useEffect(() => {
     verifyChain(chain).then(setChainStatus);
@@ -181,10 +187,60 @@ export default function ContractorView({
         </div>
       )}
 
+      {showNewWorker && (
+        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-display text-sm text-bitumen">Onboard new worker</p>
+            <button onClick={() => setShowNewWorker(false)}><X size={16} className="text-steel" /></button>
+          </div>
+          <input
+            value={workerName}
+            onChange={(e) => setWorkerName(e.target.value)}
+            placeholder="Worker name, e.g. Mahesh Yadav"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety"
+          />
+          <input
+            value={workerRole}
+            onChange={(e) => setWorkerRole(e.target.value)}
+            placeholder="Role, e.g. Mason, Helper, Electrician"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety"
+          />
+          <input
+            value={workerWage}
+            onChange={(e) => setWorkerWage(e.target.value)}
+            type="number"
+            placeholder="Daily wage (₹)"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety"
+          />
+          <p className="text-[11px] text-steel mb-3">
+            Onboards to <span className="text-bitumen font-medium">{project?.name}</span>. A Digital Worker ID is issued and the onboarding event is written to the ledger.
+          </p>
+          <button
+            disabled={!workerName.trim() || !workerRole.trim() || !workerWage}
+            onClick={() => {
+              onAddWorker(workerName.trim(), workerRole.trim(), Number(workerWage), activeProjectId);
+              setWorkerName(""); setWorkerRole(""); setWorkerWage(""); setShowNewWorker(false);
+            }}
+            className="w-full bg-tarp disabled:opacity-40 text-white text-sm font-display py-3 rounded-lg"
+          >
+            ISSUE DIGITAL WORKER ID
+          </button>
+        </div>
+      )}
+
       {/* Stat strip */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="bg-white rounded-xl p-4 border border-bitumen/10">
-          <Users size={16} className="text-steel mb-2" />
+          <div className="flex items-center justify-between mb-2">
+            <Users size={16} className="text-steel" />
+            <button
+              onClick={() => setShowNewWorker(true)}
+              title="Add worker"
+              className="text-steel hover:text-bitumen"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
           <p className="font-display text-xl text-bitumen">{projectWorkers.length}</p>
           <p className="text-[11px] text-steel">Active workers</p>
         </div>
