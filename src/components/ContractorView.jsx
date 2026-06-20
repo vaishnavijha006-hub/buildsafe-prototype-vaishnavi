@@ -100,6 +100,7 @@ function DisputeCard({ dispute, onResolve }) {
 export default function ContractorView({
   chain, workers, projects, activeProjectId, onSwitchProject,
   onTamperDemo, onResolveDispute, onCreateProject, onAddWorker,
+  notionStatus,
 }) {
   const [chainStatus, setChainStatus] = useState(null);
   const [showNewProject, setShowNewProject] = useState(false);
@@ -132,6 +133,25 @@ export default function ContractorView({
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Actions bar */}
+      <div className="flex items-center justify-between gap-3 mb-5">
+        <button
+          onClick={() => setShowNewWorker(true)}
+          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight transition-colors shrink-0"
+        >
+          <Plus size={16} /> Add new worker
+        </button>
+        {notionStatus?.connected ? (
+          <span className="text-[10px] font-mono text-tarp bg-tarp/10 border border-tarp/20 rounded-full px-3 py-1.5">
+            Notion synced
+          </span>
+        ) : (
+          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5">
+            Notion — configure .env
+          </span>
+        )}
+      </div>
+
       {/* Project switcher */}
       <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
         {projects.map((p) => (
@@ -213,7 +233,7 @@ export default function ContractorView({
             className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety"
           />
           <p className="text-[11px] text-steel mb-3">
-            Onboards to <span className="text-bitumen font-medium">{project?.name}</span>. A Digital Worker ID is issued and the onboarding event is written to the ledger.
+            Onboards to <span className="text-bitumen font-medium">{project?.name}</span>. A Digital Worker ID is issued, the event is written to the ledger, and the roster syncs to Notion.
           </p>
           <button
             disabled={!workerName.trim() || !workerRole.trim() || !workerWage}
