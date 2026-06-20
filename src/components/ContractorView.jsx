@@ -296,6 +296,57 @@ export default function ContractorView({
         )}
       </div>
 
+      {/* Active Workers Roster */}
+      <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-5 mb-6 chain-drop">
+        <h3 className="font-display text-sm text-bitumen mb-3 flex items-center gap-2">
+          <Users size={16} /> Active Workers Roster
+        </h3>
+        {projectWorkers.length === 0 ? (
+          <p className="text-xs text-steel py-4 text-center">No workers onboarded to this project yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
+                  <th className="py-2.5">Worker</th>
+                  <th className="py-2.5">Role</th>
+                  <th className="py-2.5">Contact</th>
+                  <th className="py-2.5 text-right">Daily Wage</th>
+                  <th className="py-2.5 text-right">Due Wage</th>
+                  <th className="py-2.5 text-right">Paid Wage</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-bitumen/5">
+                {projectWorkers.map((w) => {
+                  const workerEvents = projectChain.filter((b) => b.data.workerId === w.id);
+                  const paidWage = workerEvents
+                    .filter((b) => b.type === "PAYOUT")
+                    .reduce((sum, b) => sum + b.data.amount, 0);
+                  const attendanceDays = workerEvents.filter((b) => b.type === "ATTENDANCE").length;
+                  const dueWage = Math.max(0, (attendanceDays * w.dailyWage) - paidWage);
+
+                  return (
+                    <tr key={w.id} className="hover:bg-bitumen/[0.02] transition-colors">
+                      <td className="py-3 font-medium text-bitumen">
+                        <div>{w.name}</div>
+                        <div className="font-mono text-[9px] text-steel">{w.id}</div>
+                      </td>
+                      <td className="py-3 text-steel">{w.role}</td>
+                      <td className="py-3 font-mono text-steel">{w.phone || "—"}</td>
+                      <td className="py-3 text-right font-mono text-bitumen">₹{w.dailyWage}</td>
+                      <td className="py-3 text-right font-mono font-medium text-rust">
+                        ₹{dueWage}
+                      </td>
+                      <td className="py-3 text-right font-mono text-tarp">₹{paidWage}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       {/* Anomaly flags */}
       {anomalies.length > 0 && (
         <div className="bg-rust/10 border border-rust/30 rounded-2xl p-4 mb-6">
