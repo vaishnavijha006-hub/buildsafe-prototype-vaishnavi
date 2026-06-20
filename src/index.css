@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Inter', sans-serif; }
+
+.rivet {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+.scanline {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.025) 0px,
+    rgba(0,0,0,0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+@keyframes scanPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.scan-pulse { animation: scanPulse 1.4s ease-in-out infinite; }
+
+@keyframes chainDrop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chain-drop { animation: chainDrop 0.4s ease-out; }
