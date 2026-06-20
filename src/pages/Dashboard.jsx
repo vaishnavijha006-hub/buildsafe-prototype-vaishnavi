@@ -87,6 +87,9 @@ export default function Dashboard({ view }) {
     return projects[0]?.id || "";
   });
 
+  const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
+  const project = projects.find((p) => p.id === worker?.projectId);
+
   useEffect(() => {
     localStorage.setItem("buildsafe_workers", JSON.stringify(workers));
   }, [workers]);
@@ -203,9 +206,6 @@ export default function Dashboard({ view }) {
       }
     }
   }, [chain, worker, lastPayout]);
-
-  const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
-  const project = projects.find((p) => p.id === worker?.projectId);
 
   const syncLedgerToNotion = async (updatedChain) => {
     if (!notionStatus.connected) return;
