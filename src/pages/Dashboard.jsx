@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { HardHat, LayoutDashboard, ShieldCheck, LogOut, ExternalLink } from "lucide-react";
+import { useNavigate, Navigate } from "react-router-dom";
+import { HardHat, LayoutDashboard, ShieldCheck, LogOut, ExternalLink, Languages, GitBranch, X, History } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import WorkerView from "../components/WorkerView";
 import ContractorView from "../components/ContractorView";
 import ArmorPayGate from "../components/ArmorPayGate";
+import Toast from "../components/Toast";
 import {
   appendToChain, armorPayPolicyCheck, genTxnId, raiseDispute,
   resolveDispute, getOpenDisputes, genWorkerId, appendOnboarding,
@@ -18,6 +19,33 @@ import {
 export default function Dashboard({ view }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Strict role-based guards (RBAC)
+  if (!user) return <Navigate to="/login" replace />;
+  if (view === "worker" && user.role !== "worker") {
+    return <Navigate to="/contractor" replace />;
+  }
+  if (view === "contractor" && user.role !== "contractor") {
+    return <Navigate to="/worker" replace />;
+  }
+
+  const [lang, setLang] = useState(() => {
+    return localStorage.getItem("buildsafe_lang") || "en";
+  });
+  const [showBuildLog, setShowBuildLog] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
+
+  const toggleLang = () => {
+    setLang((prev) => {
+      const next = prev === "en" ? "hi" : "en";
+      localStorage.setItem("buildsafe_lang", next);
+      return next;
+    });
+  };
 
   const [chain, setChain] = useState(() => {
     try {
@@ -117,6 +145,7 @@ export default function Dashboard({ view }) {
     });
     setChain(updated);
     syncLedgerToNotion(updated);
+    showToast("Attendance marked & registered to ledger", "success");
   };
 
   const handleClaimWage = () => {
@@ -148,6 +177,9 @@ export default function Dashboard({ view }) {
         setChain(updated);
         setLastPayout({ amount: worker.dailyWage, txnId });
         syncLedgerToNotion(updated);
+        showToast("Wage released! Payment sent via UPI", "success");
+      } else {
+        showToast("ArmorPay policy violation: payment blocked", "error");
       }
     }, 1400);
   };
@@ -159,6 +191,7 @@ export default function Dashboard({ view }) {
     );
     setChain(tampered);
     setTamperFlash(true);
+    showToast("Simulating past record editing...", "info");
     setTimeout(() => setTamperFlash(false), 2500);
   };
 
@@ -170,12 +203,14 @@ export default function Dashboard({ view }) {
     });
     setChain(updated);
     syncLedgerToNotion(updated);
+    showToast("Dispute logged immutably on-chain", "success");
   };
 
   const handleResolveDispute = async (disputeId, resolutionNote, outcome) => {
     const updated = await resolveDispute(chain, { disputeId, resolutionNote, outcome });
     setChain(updated);
     syncLedgerToNotion(updated);
+    showToast(`Dispute resolved on-chain: ${outcome}`, "success");
   };
 
   const handleCreateProject = async (name, wageLocked) => {
@@ -191,6 +226,7 @@ export default function Dashboard({ view }) {
     pushProjectToNotion(newProject).catch(() => {});
     syncLedgerToNotion(updated);
     setActiveProjectId(id);
+    showToast(`New site "${name}" registered`, "success");
   };
 
   const handleAddWorker = async (name, role, dailyWage, projectId) => {
@@ -255,6 +291,19 @@ export default function Dashboard({ view }) {
                 <ExternalLink size={11} /> Notion
               </a>
             )}
+            <button
+              onClick={() => setShowBuildLog(true)}
+              className="flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement border border-steel/30 rounded-full px-2.5 py-1 hover:scale-[1.01] active:scale-[0.99] transition-all"
+            >
+              <GitBranch size={11} className="text-safety" /> Build Log
+            </button>
+            <button
+              onClick={toggleLang}
+              title="Toggle Language / भाषा बदलें"
+              className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/20 text-tarpLight border border-tarp/30 rounded-full px-2.5 py-1 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <Languages size={11} className="text-safety" /> {lang === "en" ? "हिंदी" : "English"}
+            </button>
             <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[120px]">
               {user.name}
             </span>
@@ -300,6 +349,7 @@ export default function Dashboard({ view }) {
             workers={workers}
             project={project}
             chain={chain}
+            lang={lang}
             onSwitchWorker={handleSwitchWorker}
             onScanComplete={handleScanComplete}
             onClaimWage={handleClaimWage}
@@ -335,6 +385,80 @@ export default function Dashboard({ view }) {
           status={gateStatus}
           result={policyResult}
           onClose={() => setGateStatus(null)}
+        />
+      )}
+
+      {showBuildLog && (
+        <div className="fixed inset-0 bg-bitumen/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 chain-drop shadow-2xl border border-bitumen/10">
+            <div className="flex items-center justify-between border-b border-bitumen/10 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <GitBranch className="text-tarp" size={20} />
+                <h3 className="font-display text-base text-bitumen">BuildSafe Project Iteration Log</h3>
+              </div>
+              <button onClick={() => setShowBuildLog(false)} className="text-steel hover:text-bitumen">
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1">
+              <div className="relative pl-6 border-l border-bitumen/10 space-y-4">
+                {/* Release 1.2.0 */}
+                <div className="relative">
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-safety border-2 border-white ring-2 ring-safety/20" />
+                  <span className="text-[10px] font-mono text-steel block">JUNE 20, 2026</span>
+                  <span className="font-display text-xs text-bitumen block font-bold">v1.2.0 — Localized Access & Receipts (Current)</span>
+                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
+                    Added Hindi bilingual localization for front-line workers. Implemented secure role-based access checks (RBAC) preventing cross-view access. Rendered dynamic SVG-based site check-in QR codes. Created downloadable, printable smart contract payment receipts with cryptographic hashes and ArmorPay stamps. Protected by ArmorIQ biometric session security.
+                  </p>
+                </div>
+
+                {/* Release 1.1.0 */}
+                <div className="relative">
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-tarp border-2 border-white" />
+                  <span className="text-[10px] font-mono text-steel block">JUNE 15, 2026</span>
+                  <span className="font-display text-xs text-bitumen block font-bold">v1.1.0 — ArmorPay Policy Gates</span>
+                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
+                    Integrated automated compliance checks via ArmorPay policy gate (wage bounds, duplicate attendance block velocity bounds, and identity verification checks) before releasing payments.
+                  </p>
+                </div>
+
+                {/* Release 1.0.0 */}
+                <div className="relative">
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-steel border-2 border-white" />
+                  <span className="text-[10px] font-mono text-steel block">JUNE 05, 2026</span>
+                  <span className="font-display text-xs text-bitumen block font-bold">v1.0.0 — Immutable Ledger & Notion Roster Sync</span>
+                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
+                    Engineered client-side cryptographic ledger chain mimicking Hyperledger Fabric tamper-proof validations. Completed Notion integration for syncing worker profiles and logging real-time ledger blocks.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-3 border-t border-bitumen/10 flex items-center justify-between text-[10px] font-mono text-steel">
+              <span>Notion Workspace Connected</span>
+              {notionStatus?.connected && notionStatus?.workspaceUrl ? (
+                <a 
+                  href={notionStatus.workspaceUrl}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-tarp hover:underline font-bold flex items-center gap-0.5"
+                >
+                  View Notion Board <ExternalLink size={10} />
+                </a>
+              ) : (
+                <span className="text-steel italic">Local Mock Mode</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

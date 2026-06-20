@@ -32,3 +32,42 @@ body { margin: 0; font-family: 'Inter', sans-serif; }
   to { opacity: 1; transform: translateY(0); }
 }
 .chain-drop { animation: chainDrop 0.4s ease-out; }
+
+/* Print layout for printable receipt */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-card, .receipt-card * {
+    visibility: visible;
+  }
+  .receipt-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100% !important;
+    border: none !important;
+    background: white !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Short animation for toast alerts */
+@keyframes bounceShort {
+  0% { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-bounce-short {
+  animation: bounceShort 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Base interactive transitions */
+button, select, input, textarea, a {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}

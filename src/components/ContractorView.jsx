@@ -82,13 +82,13 @@ function DisputeCard({ dispute, onResolve }) {
       <div className="flex gap-2">
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Wage released after verification", "WAGE_RELEASED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-tarp text-white text-[11px] font-display py-2 rounded-lg"
+          className="flex-1 flex items-center justify-center gap-1 bg-tarp text-white text-[11px] font-display py-2 rounded-lg hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 shadow-sm"
         >
           <CheckCircle2 size={13} /> Release wage
         </button>
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Claim rejected after review", "REJECTED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-steel text-white text-[11px] font-display py-2 rounded-lg"
+          className="flex-1 flex items-center justify-center gap-1 bg-steel text-white text-[11px] font-display py-2 rounded-lg hover:bg-steel/80 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 shadow-sm"
         >
           <XCircle size={13} /> Reject
         </button>
@@ -137,7 +137,7 @@ export default function ContractorView({
       <div className="flex items-center justify-between gap-3 mb-5">
         <button
           onClick={() => setShowNewWorker(true)}
-          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight transition-colors shrink-0"
+          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shrink-0 shadow-md"
         >
           <Plus size={16} /> Add new worker
         </button>
@@ -169,7 +169,7 @@ export default function ContractorView({
         ))}
         <button
           onClick={() => setShowNewProject(true)}
-          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-steel/40 text-steel flex items-center gap-1"
+          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-steel/40 text-steel hover:bg-bitumen/5 hover:border-steel/60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center gap-1"
         >
           <Plus size={13} /> New site
         </button>
@@ -200,7 +200,7 @@ export default function ContractorView({
               onCreateProject(newName.trim(), Number(newWage));
               setNewName(""); setNewWage(""); setShowNewProject(false);
             }}
-            className="w-full bg-safety disabled:opacity-40 text-bitumen text-sm font-display py-3 rounded-lg"
+            className="w-full bg-safety disabled:opacity-40 text-bitumen text-sm font-display py-3 rounded-lg hover:bg-safetyDark hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md"
           >
             LOCK WAGE TERMS ON-CHAIN
           </button>
@@ -241,7 +241,7 @@ export default function ContractorView({
               onAddWorker(workerName.trim(), workerRole.trim(), Number(workerWage), activeProjectId);
               setWorkerName(""); setWorkerRole(""); setWorkerWage(""); setShowNewWorker(false);
             }}
-            className="w-full bg-tarp disabled:opacity-40 text-white text-sm font-display py-3 rounded-lg"
+            className="w-full bg-tarp disabled:opacity-40 text-white text-sm font-display py-3 rounded-lg hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md"
           >
             ISSUE DIGITAL WORKER ID
           </button>
@@ -362,18 +362,26 @@ export default function ContractorView({
       )}
 
       {/* Open disputes */}
-      {openDisputes.length > 0 && (
-        <div className="mb-6">
-          <p className="font-display text-sm text-bitumen flex items-center gap-1.5 mb-3">
-            <AlertTriangle size={15} className="text-rust" /> Open disputes ({openDisputes.length})
-          </p>
+      <div className="mb-6">
+        <p className="font-display text-sm text-bitumen flex items-center gap-1.5 mb-3">
+          <AlertTriangle size={15} className="text-rust" /> Open disputes ({openDisputes.length})
+        </p>
+        {openDisputes.length > 0 ? (
           <div className="space-y-3">
             {openDisputes.map((d) => (
               <DisputeCard key={d.data.disputeId} dispute={d} onResolve={onResolveDispute} />
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="bg-white border border-bitumen/10 rounded-xl p-5 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-6">
+            <div className="bg-tarp/10 p-2 rounded-full text-tarp">
+              <ShieldCheck size={18} />
+            </div>
+            <p className="font-display text-xs text-bitumen">No active disputes</p>
+            <p className="text-[10px] text-steel max-w-[340px]">All worker attendance records are aligned. No wage claims are currently flagged as contested.</p>
+          </div>
+        )}
+      </div>
 
       {/* Ledger chain visual */}
       <div className="flex items-center justify-between mb-3">
@@ -382,7 +390,7 @@ export default function ContractorView({
         </p>
         <button
           onClick={onTamperDemo}
-          className="text-[11px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/5"
+          className="text-[11px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/5 hover:scale-[1.01] active:scale-[0.99] transition-all"
           title="Demo: simulate a contractor trying to edit a past record"
         >
           ⚠ Try tampering (demo)
@@ -390,12 +398,19 @@ export default function ContractorView({
       </div>
 
       <div className="space-y-0 max-h-[420px] overflow-y-auto pr-1">
-        {chain.length === 0 && (
-          <p className="text-sm text-steel text-center py-8">No blocks yet — mark attendance to begin the ledger.</p>
+        {chain.length === 0 ? (
+          <div className="bg-white border border-bitumen/10 rounded-xl p-6 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-8">
+            <div className="bg-safety/20 p-2.5 rounded-full text-bitumen">
+              <Activity size={20} className="animate-pulse" />
+            </div>
+            <p className="font-display text-xs text-bitumen">Ledger is empty</p>
+            <p className="text-[10px] text-steel max-w-[280px]">No blocks have been written to the ledger yet. Worker attendance check-ins will generate the first blocks.</p>
+          </div>
+        ) : (
+          chain.map((block) => (
+            <BlockCard key={block.hash} block={block} />
+          ))
         )}
-        {chain.map((block) => (
-          <BlockCard key={block.hash} block={block} />
-        ))}
       </div>
     </div>
   );

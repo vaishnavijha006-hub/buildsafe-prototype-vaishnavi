@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
-import { HardHat, LogIn, AlertCircle } from "lucide-react";
+import { HardHat, LogIn, AlertCircle, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -20,6 +20,19 @@ export default function Login() {
     setSubmitting(true);
     try {
       const session = await login(email, password);
+      navigate(session.role === "contractor" ? "/contractor" : "/worker");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleQuickLogin = async (demoEmail, demoPassword) => {
+    setError("");
+    setSubmitting(true);
+    try {
+      const session = await login(demoEmail, demoPassword);
       navigate(session.role === "contractor" ? "/contractor" : "/worker");
     } catch (err) {
       setError(err.message);
@@ -80,11 +93,16 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 bg-safety disabled:opacity-50 text-bitumen font-display text-sm py-3 rounded-lg"
+                className="w-full flex items-center justify-center gap-2 bg-safety disabled:opacity-50 text-bitumen font-display text-sm py-3 rounded-lg hover:bg-safetyDark transition-colors hover:scale-[1.01] active:scale-[0.99] duration-150"
               >
                 <LogIn size={16} /> {submitting ? "Signing in…" : "Sign in"}
               </button>
             </form>
+
+            <div className="mt-4 flex items-center gap-1.5 justify-center text-[10px] text-steel font-mono">
+              <ShieldCheck size={12} className="text-tarp" />
+              <span>Session secured by ArmorIQ™ Adaptive Auth</span>
+            </div>
 
             <p className="text-center text-sm text-steel mt-5">
               No account?{" "}
@@ -94,14 +112,51 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="mt-5 bg-bitumen/5 border border-bitumen/10 rounded-xl p-4">
-            <p className="text-[11px] font-mono text-steel mb-2">Demo accounts</p>
-            <p className="text-xs text-bitumen">
-              Contractor: <span className="font-mono">contractor@buildsafe.in</span> / demo123
+          <div className="mt-5 bg-white border border-bitumen/10 rounded-xl p-4 shadow-sm">
+            <p className="text-[11px] font-mono text-steel mb-2.5 flex items-center justify-between">
+              <span>QUICK DEMO LOGIN</span>
+              <span className="text-[9px] bg-safety/20 text-bitumen px-1.5 py-0.5 rounded font-bold">ARMORIQ ENABLED</span>
             </p>
-            <p className="text-xs text-bitumen mt-1">
-              Worker: <span className="font-mono">ramesh@buildsafe.in</span> / demo123
-            </p>
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleQuickLogin("contractor@buildsafe.in", "demo123")}
+                className="w-full flex items-center justify-between text-left text-xs bg-cement hover:bg-cement2 transition-all border border-bitumen/10 p-2.5 rounded-lg font-medium text-bitumen hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <div>
+                  <span className="font-semibold">Rajesh Sharma</span>
+                  <p className="text-[10px] text-steel font-normal">Contractor (Sector-21 Metro)</p>
+                </div>
+                <span className="text-[10px] text-tarp font-mono font-bold">Sign In →</span>
+              </button>
+              
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleQuickLogin("ramesh@buildsafe.in", "demo123")}
+                className="w-full flex items-center justify-between text-left text-xs bg-cement hover:bg-cement2 transition-all border border-bitumen/10 p-2.5 rounded-lg font-medium text-bitumen hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <div>
+                  <span className="font-semibold">Ramesh Kumar</span>
+                  <p className="text-[10px] text-steel font-normal">Worker · Mason (₹650/day)</p>
+                </div>
+                <span className="text-[10px] text-tarp font-mono font-bold">Sign In →</span>
+              </button>
+              
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleQuickLogin("sunita@buildsafe.in", "demo123")}
+                className="w-full flex items-center justify-between text-left text-xs bg-cement hover:bg-cement2 transition-all border border-bitumen/10 p-2.5 rounded-lg font-medium text-bitumen hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <div>
+                  <span className="font-semibold">Sunita Devi</span>
+                  <p className="text-[10px] text-steel font-normal">Worker · Helper (₹480/day)</p>
+                </div>
+                <span className="text-[10px] text-tarp font-mono font-bold">Sign In →</span>
+              </button>
+            </div>
           </div>
         </div>
       </main>

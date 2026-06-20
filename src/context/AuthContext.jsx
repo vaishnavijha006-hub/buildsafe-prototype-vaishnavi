@@ -21,12 +21,35 @@ const DEMO_USERS = [
     role: "worker",
     workerId: "BSW-4821",
   },
+  {
+    id: "usr-worker-2",
+    email: "sunita@buildsafe.in",
+    password: "demo123",
+    name: "Sunita Devi",
+    role: "worker",
+    workerId: "BSW-4822",
+  },
 ];
 
 function loadUsers() {
   try {
     const stored = localStorage.getItem(USERS_KEY);
-    if (stored) return JSON.parse(stored);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Ensure all demo users exist in the local storage list
+      let modified = false;
+      const updated = [...parsed];
+      for (const demo of DEMO_USERS) {
+        if (!updated.some((u) => u.email.toLowerCase() === demo.email.toLowerCase())) {
+          updated.push(demo);
+          modified = true;
+        }
+      }
+      if (modified) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(updated));
+      }
+      return updated;
+    }
   } catch { /* ignore */ }
   localStorage.setItem(USERS_KEY, JSON.stringify(DEMO_USERS));
   return DEMO_USERS;
