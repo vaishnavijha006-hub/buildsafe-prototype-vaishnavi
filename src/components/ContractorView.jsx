@@ -142,12 +142,14 @@ export default function ContractorView({
           <Plus size={16} /> Add new worker
         </button>
         {notionStatus?.connected ? (
-          <span className="text-[10px] font-mono text-tarp bg-tarp/10 border border-tarp/20 rounded-full px-3 py-1.5">
-            Notion synced
+          <span className="text-[10px] font-mono text-tarp bg-tarp/10 border border-tarp/20 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-tarp animate-pulse" />
+            Notion Sync Active
           </span>
         ) : (
-          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5">
-            Notion — configure .env
+          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5 flex items-center gap-1.5 cursor-help" title="BuildSafe runs in local-first secure offline mode. Connect Notion database in production.">
+            <span className="w-1.5 h-1.5 rounded-full bg-steel/60" />
+            Notion Ledger (Offline)
           </span>
         )}
       </div>

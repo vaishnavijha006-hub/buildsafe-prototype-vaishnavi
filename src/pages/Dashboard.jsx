@@ -120,6 +120,90 @@ export default function Dashboard({ view }) {
     }
   }, [view]);
 
+  // Ledger auto-seeding if empty (persists default attendance/payouts so due wages are non-zero)
+  useEffect(() => {
+    const seed = async () => {
+      if (chain.length > 0) return;
+      
+      let seeded = [];
+      // 1. Genesis/Project Created
+      seeded = await appendToChain(seeded, "PROJECT_CREATED", {
+        projectId: "PRJ-101",
+        projectName: "Sector-21 Metro Extension — Site B",
+        wageLocked: 187000,
+      });
+      // 2. Onboard Ramesh Kumar
+      seeded = await appendOnboarding(seeded, {
+        workerId: "BSW-4821",
+        workerName: "Ramesh Kumar",
+        role: "Mason",
+        projectId: "PRJ-101",
+        dailyWage: 650,
+      });
+      // 3. Onboard Sunita Devi
+      seeded = await appendOnboarding(seeded, {
+        workerId: "BSW-4822",
+        workerName: "Sunita Devi",
+        role: "Helper",
+        projectId: "PRJ-101",
+        dailyWage: 480,
+      });
+      // 4. Attendance Day 1 Ramesh
+      seeded = await appendToChain(seeded, "ATTENDANCE", {
+        workerId: "BSW-4821",
+        workerName: "Ramesh Kumar",
+        project: "Sector-21 Metro Extension — Site B",
+        gps: "28.5921°N, 77.2547°E",
+        method: "QR_SCAN",
+      });
+      // 5. Payout Day 1 Ramesh
+      seeded = await appendToChain(seeded, "PAYOUT", {
+        workerId: "BSW-4821",
+        workerName: "Ramesh Kumar",
+        amount: 650,
+        txnId: "UPI98231456100",
+        method: "UPI",
+        armorPayVerified: true,
+      });
+      // 6. Attendance Day 2 Ramesh (Ramesh has 1 unpaid check-in)
+      seeded = await appendToChain(seeded, "ATTENDANCE", {
+        workerId: "BSW-4821",
+        workerName: "Ramesh Kumar",
+        project: "Sector-21 Metro Extension — Site B",
+        gps: "28.5921°N, 77.2547°E",
+        method: "QR_SCAN",
+      });
+      // 7. Attendance Day 1 Sunita (Sunita has 1 unpaid check-in)
+      seeded = await appendToChain(seeded, "ATTENDANCE", {
+        workerId: "BSW-4822",
+        workerName: "Sunita Devi",
+        project: "Sector-21 Metro Extension — Site B",
+        gps: "28.5921°N, 77.2547°E",
+        method: "QR_SCAN",
+      });
+      
+      setChain(seeded);
+      localStorage.setItem("buildsafe_chain", JSON.stringify(seeded));
+    };
+    
+    if (chain.length === 0) {
+      seed();
+    }
+  }, []);
+
+  // Sync lastPayout from chain if state is null but chain has today's payout
+  useEffect(() => {
+    if (!lastPayout && worker) {
+      const activeWorkerPayouts = chain.filter(
+        (b) => b.type === "PAYOUT" && b.data.workerId === worker.id
+      );
+      const lastBlock = activeWorkerPayouts[activeWorkerPayouts.length - 1];
+      if (lastBlock && (Date.now() - lastBlock.timestamp < 12 * 60 * 60 * 1000)) {
+        setLastPayout({ amount: lastBlock.data.amount, txnId: lastBlock.data.txnId });
+      }
+    }
+  }, [chain, worker, lastPayout]);
+
   const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
   const project = projects.find((p) => p.id === worker?.projectId);
 

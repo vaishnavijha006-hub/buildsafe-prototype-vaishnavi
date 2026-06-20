@@ -114,8 +114,17 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const resetPassword = useCallback(async (email, newPassword) => {
+    const users = loadUsers();
+    const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (idx === -1) throw new Error("No account registered with this email");
+    users[idx].password = newPassword;
+    saveUsers(users);
+    return users[idx];
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
