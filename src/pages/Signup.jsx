@@ -4,7 +4,7 @@ import { HardHat, UserPlus, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { WORKERS, PROJECTS } from "../lib/seedData";
 import { genWorkerId, appendOnboarding } from "../lib/ledger";
-import { pushWorkerToNotion } from "../lib/notionClient";
+import { syncWorkerRoster } from "../lib/syncStore";
 
 export default function Signup() {
   const { signup, user, loading } = useAuth();
@@ -73,11 +73,11 @@ export default function Signup() {
         });
         localStorage.setItem("buildsafe_chain", JSON.stringify(updatedChain));
         
-        // Try syncing to Notion
+        // Try syncing to local storage
         try {
-          await pushWorkerToNotion(newWorker);
+          await syncWorkerRoster(newWorker);
         } catch (err) {
-          console.warn("[Notion Sync Failed]", err);
+          console.warn("[Local Sync Failed]", err);
         }
       }
 
@@ -109,7 +109,7 @@ export default function Signup() {
           <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-7 shadow-sm chain-drop">
             <h1 className="font-display text-xl text-bitumen mb-1">Create account</h1>
             <p className="text-sm text-steel mb-6">
-              Register as a contractor or worker. New accounts sync to your Notion workspace.
+              Register as a contractor or worker. New accounts sync to your local storage record.
             </p>
 
             {error && (

@@ -9,8 +9,8 @@ import { verifyChain, getOpenDisputes, detectAnomalies } from "../lib/ledger";
 const dict = {
   en: {
     addWorker: "Add new worker",
-    notionActive: "Notion Sync Active",
-    notionOffline: "Notion Ledger (Offline)",
+    notionActive: "Local Sync Active",
+    notionOffline: "Local Sync (Offline)",
     newSite: "New site",
     registerProject: "Register new project",
     projectNamePlaceholder: "Project name, e.g. Riverside Bridge — Phase 1",
@@ -21,7 +21,7 @@ const dict = {
     rolePlaceholder: "Role, e.g. Mason, Helper, Electrician",
     dailyWagePlaceholder: "Daily wage (₹)",
     onboardDesc: "Onboards to",
-    onboardDescSuffix: ". A Digital Worker ID is issued, the event is written to the ledger, and the roster syncs to Notion.",
+    onboardDescSuffix: ". A Digital Worker ID is issued, the event is written to the ledger, and the roster syncs to local storage.",
     issueDigitalId: "ISSUE DIGITAL WORKER ID",
     activeWorkers: "Active workers",
     attendanceMarks: "Attendance marks",
@@ -281,7 +281,7 @@ function DisputeCard({ dispute, onResolve, lang = "en" }) {
 export default function ContractorView({
   chain, workers, projects, activeProjectId, onSwitchProject,
   onTamperDemo, onResolveDispute, onCreateProject, onAddWorker,
-  notionStatus, lang = "en",
+  syncStatus, lang = "en",
 }) {
   const t = dict[lang] || dict.en;
   const [chainStatus, setChainStatus] = useState(null);
@@ -325,13 +325,13 @@ export default function ContractorView({
         >
           <Plus size={16} /> {t.addWorker}
         </button>
-        {notionStatus?.connected ? (
+        {syncStatus?.connected ? (
           <span className="text-[10px] font-mono text-tarp bg-tarp/10 border border-tarp/20 rounded-full px-3 py-1.5 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-tarp animate-pulse" />
             {t.notionActive}
           </span>
         ) : (
-          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5 flex items-center gap-1.5 cursor-help" title="BuildSafe runs in local-first secure offline mode. Connect Notion database in production.">
+          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5 flex items-center gap-1.5 cursor-help" title="BuildSafe is running in local-first secure offline mode.">
             <span className="w-1.5 h-1.5 rounded-full bg-steel/60" />
             {t.notionOffline}
           </span>

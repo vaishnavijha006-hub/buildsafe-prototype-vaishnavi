@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { pushUserToNotion } from "../lib/notionClient";
+import { syncUser } from "../lib/syncStore";
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = "buildsafe_auth";
@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
     users.push(newUser);
     saveUsers(users);
 
-    pushUserToNotion(newUser).catch(() => {});
+    syncUser(newUser).catch(() => {});
 
     const session = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role, workerId: newUser.workerId };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));

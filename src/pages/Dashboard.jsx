@@ -13,9 +13,9 @@ import {
 } from "../lib/ledger";
 import { WORKERS, PROJECTS } from "../lib/seedData";
 import {
-  getNotionStatus, syncWorkersFromNotion, pushWorkerToNotion,
-  pushProjectToNotion, pushLedgerEventToNotion,
-} from "../lib/notionClient";
+  getSyncStatus, syncWorkersFromStore, syncWorkerRoster,
+  syncProject, syncLedgerEntry,
+} from "../lib/syncStore";
 
 export default function Dashboard({ view }) {
   const { user, logout } = useAuth();
@@ -60,8 +60,8 @@ export default function Dashboard({ view }) {
   const [gateStatus, setGateStatus] = useState(null);
   const [policyResult, setPolicyResult] = useState(null);
   const [tamperFlash, setTamperFlash] = useState(false);
-  const [notionStatus, setNotionStatus] = useState({ connected: false });
-  const [notionSyncMsg, setNotionSyncMsg] = useState(null);
+  const [syncStatus, setSyncStatus] = useState({ connected: false });
+  const [syncMsg, setSyncMsg] = useState(null);
 
   const [workers, setWorkers] = useState(() => {
     try {
@@ -130,20 +130,20 @@ export default function Dashboard({ view }) {
   }, [chain]);
 
   useEffect(() => {
-    getNotionStatus().then(setNotionStatus);
+    getSyncStatus().then(setSyncStatus);
     if (view === "contractor") {
-      syncWorkersFromNotion()
-        .then((notionWorkers) => {
-          if (notionWorkers?.length) {
+      syncWorkersFromStore()
+        .then((storedWorkers) => {
+          if (storedWorkers?.length) {
             setWorkers((prev) => {
               const existing = new Set(prev.map((w) => w.id));
               const merged = [...prev];
-              for (const nw of notionWorkers) {
-                if (!existing.has(nw.id)) merged.push(nw);
+              for (const sw of storedWorkers) {
+                if (!existing.has(sw.id)) merged.push(sw);
               }
               return merged;
             });
-            setNotionSyncMsg(`Synced ${notionWorkers.length} workers from Notion`);
+            setSyncMsg(`Synced ${storedWorkers.length} workers from local record`);
           }
         })
         .catch(() => {});
@@ -238,10 +238,10 @@ export default function Dashboard({ view }) {
 
  
 
-  const syncLedgerToNotion = async (updatedChain) => {
-    if (!notionStatus.connected) return;
+  const syncLedgerToStore = async (updatedChain) => {
+    if (!syncStatus.connected) return;
     const latest = updatedChain[updatedChain.length - 1];
-    if (latest) pushLedgerEventToNotion(latest).catch(() => {});
+    if (latest) syncLedgerEntry(latest).catch(() => {});
   };
 
   const handleSwitchWorker = (id) => {
@@ -288,7 +288,7 @@ export default function Dashboard({ view }) {
       masterBudget: Number(masterBudget),
     });
     setChain(updated);
-    syncLedgerToNotion(updated);
+    syncLedgerToStore(updated);
     showToast(`Contractor "${name}" onboarded & credentials created`, "success");
   };
 
@@ -301,7 +301,7 @@ export default function Dashboard({ view }) {
       method: "QR_SCAN",
     });
     setChain(updated);
-    syncLedgerToNotion(updated);
+    syncLedgerToStore(updated);
     showToast("Attendance marked & registered to ledger", "success");
   };
 
@@ -333,7 +333,7 @@ export default function Dashboard({ view }) {
         });
         setChain(updated);
         setLastPayout({ amount: worker.dailyWage, txnId });
-        syncLedgerToNotion(updated);
+        syncLedgerToStore(updated);
         showToast("Wage released! Payment sent via UPI", "success");
       } else {
         showToast("ArmorPay policy violation: payment blocked", "error");
@@ -359,14 +359,14 @@ export default function Dashboard({ view }) {
       reason,
     });
     setChain(updated);
-    syncLedgerToNotion(updated);
+    syncLedgerToStore(updated);
     showToast("Dispute logged immutably on-chain", "success");
   };
 
   const handleResolveDispute = async (disputeId, resolutionNote, outcome) => {
     const updated = await resolveDispute(chain, { disputeId, resolutionNote, outcome });
     setChain(updated);
-    syncLedgerToNotion(updated);
+    syncLedgerToStore(updated);
     showToast(`Dispute resolved on-chain: ${outcome}`, "success");
   };
 
@@ -380,8 +380,8 @@ export default function Dashboard({ view }) {
       wageLocked,
     });
     setChain(updated);
-    pushProjectToNotion(newProject).catch(() => {});
-    syncLedgerToNotion(updated);
+    syncProject(newProject).catch(() => {});
+    syncLedgerToStore(updated);
     setActiveProjectId(id);
     showToast(`New site "${name}" registered`, "success");
   };
@@ -410,12 +410,12 @@ export default function Dashboard({ view }) {
     setChain(updated);
 
     try {
-      await pushWorkerToNotion(newWorker);
-      setNotionSyncMsg(`Worker ${name} synced to Notion`);
+      await syncWorkerRoster(newWorker);
+      setSyncMsg(`Worker ${name} synced to local record`);
     } catch {
-      setNotionSyncMsg(`Worker ${name} added locally (Notion sync pending)`);
+      setSyncMsg(`Worker ${name} added locally (Sync pending)`);
     }
-    syncLedgerToNotion(updated);
+    syncLedgerToStore(updated);
   };
 
   const handleLogout = () => {
@@ -442,16 +442,6 @@ export default function Dashboard({ view }) {
 
           {/* Right controls */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
-            {notionStatus.connected && (
-              <a
-                href={notionStatus.workspaceUrl || "https://notion.so"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement hover:bg-white/5 border border-steel/30 rounded-full px-2.5 py-1 transition-all duration-150"
-              >
-                <ExternalLink size={11} /> Notion
-              </a>
-            )}
             {/* Build Log — icon only on mobile */}
             <button
               onClick={() => setShowBuildLog(true)}
@@ -505,9 +495,9 @@ export default function Dashboard({ view }) {
         </div>
       </header>
 
-      {notionSyncMsg && (
+      {syncMsg && (
         <div className="bg-tarp/10 border-b border-tarp/20 text-center text-xs font-mono text-tarp py-1.5 chain-drop">
-          {notionSyncMsg}
+          {syncMsg}
         </div>
       )}
 
@@ -541,7 +531,7 @@ export default function Dashboard({ view }) {
             projects={projects}
             contractors={contractors}
             onAddContractor={handleAddContractor}
-            notionStatus={notionStatus}
+            syncStatus={syncStatus}
             lang={lang}
           />
         ) : (
@@ -555,7 +545,7 @@ export default function Dashboard({ view }) {
             onResolveDispute={handleResolveDispute}
             onCreateProject={handleCreateProject}
             onAddWorker={handleAddWorker}
-            notionStatus={notionStatus}
+            syncStatus={syncStatus}
             lang={lang}
           />
         )}
@@ -564,7 +554,7 @@ export default function Dashboard({ view }) {
       <footer className="text-center py-6 text-[11px] text-steel font-mono flex items-center justify-center gap-1.5">
         <ShieldCheck size={12} />
         Hash-chained ledger · ArmorPay policy-gated payouts
-        {notionStatus.connected && " · Notion workspace connected"}
+        {syncStatus.connected && " · Local sync active"}
       </footer>
 
       {gateStatus && (
@@ -614,28 +604,17 @@ export default function Dashboard({ view }) {
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-steel border-2 border-white" />
                   <span className="text-[10px] font-mono text-steel block">JUNE 05, 2026</span>
-                  <span className="font-display text-xs text-bitumen block font-bold">v1.0.0 — Immutable Ledger & Notion Roster Sync</span>
+                  <span className="font-display text-xs text-bitumen block font-bold">v1.0.0 — Immutable Ledger & Local Storage Sync</span>
                   <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
-                    Engineered client-side cryptographic ledger chain mimicking Hyperledger Fabric tamper-proof validations. Completed Notion integration for syncing worker profiles and logging real-time ledger blocks.
+                    Engineered client-side cryptographic ledger chain mimicking Hyperledger Fabric tamper-proof validations. Completed local storage integration for syncing worker profiles and logging real-time ledger blocks.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="mt-5 pt-3 border-t border-bitumen/10 flex items-center justify-between text-[10px] font-mono text-steel">
-              <span>Notion Workspace Connected</span>
-              {notionStatus?.connected && notionStatus?.workspaceUrl ? (
-                <a 
-                  href={notionStatus.workspaceUrl}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-tarp hover:underline font-bold flex items-center gap-0.5"
-                >
-                  View Notion Board <ExternalLink size={10} />
-                </a>
-              ) : (
-                <span className="text-steel italic">Local Mock Mode</span>
-              )}
+              <span>Local Sync Active</span>
+              <span className="text-steel italic">Local Mock Mode</span>
             </div>
           </div>
         </div>
