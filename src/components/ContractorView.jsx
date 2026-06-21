@@ -292,6 +292,8 @@ export default function ContractorView({
   const [workerName, setWorkerName] = useState("");
   const [workerRole, setWorkerRole] = useState("");
   const [workerWage, setWorkerWage] = useState("");
+  const [biometricStatus, setBiometricStatus] = useState("idle"); // idle | scanning | verified
+  const [biometricSessionId, setBiometricSessionId] = useState("");
 
   useEffect(() => {
     verifyChain(chain).then(setChainStatus);
@@ -419,11 +421,48 @@ export default function ContractorView({
           <p className="text-[11px] text-steel mb-3">
             {t.onboardDesc} <span className="text-bitumen font-medium">{project?.name}</span>{t.onboardDescSuffix}
           </p>
+
+          {/* Biometric Verification Step */}
+          <div className="mb-4">
+            <p className="text-xs font-medium text-bitumen mb-2 flex items-center gap-1.5">
+              <ShieldCheck size={14} className="text-tarp" /> Biometric verification
+            </p>
+            {biometricStatus === "idle" ? (
+              <button
+                onClick={() => {
+                  setBiometricStatus("scanning");
+                  setTimeout(() => {
+                    setBiometricStatus("verified");
+                    setBiometricSessionId(`BIO-${Math.floor(100000 + Math.random() * 900000)}`);
+                  }, 1800);
+                }}
+                className="w-full flex items-center justify-center gap-2 border border-bitumen/15 bg-cement2/30 hover:bg-cement2 hover:border-bitumen/30 text-bitumen text-xs font-display py-2.5 rounded-lg transition-all duration-150"
+              >
+                <Activity size={14} /> Capture biometric session
+              </button>
+            ) : biometricStatus === "scanning" ? (
+              <div className="w-full flex flex-col items-center justify-center border border-tarp/30 bg-tarp/5 py-3 rounded-lg scanline relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-tarp opacity-50 scan-pulse" />
+                <Activity size={16} className="text-tarp animate-pulse mb-1" />
+                <span className="text-[10px] font-mono text-tarp">Verifying via ArmorIQ...</span>
+              </div>
+            ) : (
+              <div className="w-full flex flex-col items-center justify-center border border-tarp/30 bg-tarp/10 py-2.5 rounded-lg">
+                <div className="flex items-center gap-1.5 text-tarp text-xs font-medium mb-0.5">
+                  <CheckCircle2 size={14} /> Biometric session verified · ArmorIQ
+                </div>
+                <span className="text-[9px] font-mono text-tarp/70">Session ID: {biometricSessionId}</span>
+              </div>
+            )}
+          </div>
+
           <button
-            disabled={!workerName.trim() || !workerRole.trim() || !workerWage}
+            disabled={!workerName.trim() || !workerRole.trim() || !workerWage || biometricStatus !== "verified"}
             onClick={() => {
-              onAddWorker(workerName.trim(), workerRole.trim(), Number(workerWage), activeProjectId);
-              setWorkerName(""); setWorkerRole(""); setWorkerWage(""); setShowNewWorker(false);
+              onAddWorker(workerName.trim(), workerRole.trim(), Number(workerWage), activeProjectId, biometricSessionId);
+              setWorkerName(""); setWorkerRole(""); setWorkerWage(""); 
+              setBiometricStatus("idle"); setBiometricSessionId("");
+              setShowNewWorker(false);
             }}
             className="w-full bg-tarp disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-display py-3 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
           >

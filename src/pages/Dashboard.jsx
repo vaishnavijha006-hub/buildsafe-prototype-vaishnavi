@@ -386,7 +386,7 @@ export default function Dashboard({ view }) {
     showToast(`New site "${name}" registered`, "success");
   };
 
-  const handleAddWorker = async (name, role, dailyWage, projectId) => {
+  const handleAddWorker = async (name, role, dailyWage, projectId, biometricSessionId) => {
     const id = genWorkerId();
     const newWorker = {
       id,
@@ -404,6 +404,8 @@ export default function Dashboard({ view }) {
       role,
       projectId,
       dailyWage,
+      biometricVerified: Boolean(biometricSessionId),
+      biometricSessionId: biometricSessionId || null,
     });
     setChain(updated);
 

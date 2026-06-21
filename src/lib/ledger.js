@@ -112,13 +112,25 @@ export function genWorkerId() {
 // Worker ID is issued. This is the literal "Worker completes
 // onboarding and gets a digital ID" step from the pitch, made visible
 // in the ledger rather than just a row in a database.
-export async function appendOnboarding(chain, { workerId, workerName, role, projectId, dailyWage }) {
+//
+// biometricVerified / biometricSessionId: set by the ArmorIQ
+// biometric widget in the onboarding form. In production this would
+// be replaced by an actual SDK call to ArmorIQ's session endpoint;
+// here we store the simulated session ID so the ledger audit trail
+// is structurally identical to what a real integration would produce.
+export async function appendOnboarding(chain, {
+  workerId, workerName, role, projectId, dailyWage,
+  biometricVerified = false, biometricSessionId = null,
+}) {
   return appendToChain(chain, "WORKER_ONBOARDED", {
     workerId,
     workerName,
     role,
     projectId,
     dailyWage,
+    // ArmorIQ biometric session (simulated in demo; real SDK call in production)
+    biometricVerified,
+    biometricSessionId,
   });
 }
 
