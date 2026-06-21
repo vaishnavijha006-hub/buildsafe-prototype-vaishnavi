@@ -156,7 +156,7 @@ export default function Signup() {
               <div>
                 <label className="block text-xs font-medium text-bitumen mb-1.5">I am a…</label>
                 <div className="flex gap-2">
-                  {["worker", "contractor"].map((r) => (
+                  {["worker", "contractor", "builder"].map((r) => (
                     <button
                       key={r}
                       type="button"

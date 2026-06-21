@@ -29,6 +29,13 @@ const DEMO_USERS = [
     role: "worker",
     workerId: "BSW-4822",
   },
+  {
+    id: "usr-builder-1",
+    email: "builder@buildsafe.in",
+    password: "demo123",
+    name: "Amit Verma",
+    role: "builder",
+  },
 ];
 
 function loadUsers() {

@@ -207,3 +207,33 @@ export function buildWorkHistory(chain, workerId) {
   const disputesRaised = events.filter((b) => b.type === "DISPUTE_RAISED").length;
   return { events, attendanceDays, totalEarned, disputesRaised };
 }
+
+// Rolls up ledger + dispute + anomaly data across all contractors
+// under a single builder, for the Builder dashboard.
+export function buildBuilderSummary(chain, contractorAssignments, projects) {
+  const summary = contractorAssignments.map((assignment) => {
+    const project = projects.find((p) => p.id === assignment.projectId);
+    const projectBlocks = chain.filter(
+      (b) => b.data.projectId === assignment.projectId || b.data.project === project?.name
+    );
+    const wagesDisbursed = projectBlocks
+      .filter((b) => b.type === "PAYOUT")
+      .reduce((sum, b) => sum + b.data.amount, 0);
+    const openDisputeCount = getOpenDisputes(projectBlocks).length;
+
+    return {
+      ...assignment,
+      projectName: project?.name || "Unknown project",
+      wageLocked: project?.wageLocked || 0,
+      wagesDisbursed,
+      openDisputeCount,
+      blockCount: projectBlocks.length,
+    };
+  });
+
+  const totalDisbursed = summary.reduce((sum, s) => sum + s.wagesDisbursed, 0);
+  const totalLocked = summary.reduce((sum, s) => sum + s.wageLocked, 0);
+  const totalDisputes = summary.reduce((sum, s) => sum + s.openDisputeCount, 0);
+
+  return { contractors: summary, totalDisbursed, totalLocked, totalDisputes };
+}

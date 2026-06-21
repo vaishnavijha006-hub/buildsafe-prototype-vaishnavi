@@ -9,7 +9,7 @@ function RootRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={user.role === "contractor" ? "/contractor" : "/worker"} replace />;
+  return <Navigate to={`/${user.role}`} replace />;
 }
 
 export default function App() {
@@ -33,6 +33,14 @@ export default function App() {
             element={
               <ProtectedRoute role="contractor">
                 <Dashboard view="contractor" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/builder"
+            element={
+              <ProtectedRoute role="builder">
+                <Dashboard view="builder" />
               </ProtectedRoute>
             }
           />

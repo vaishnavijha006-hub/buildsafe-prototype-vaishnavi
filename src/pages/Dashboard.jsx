@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
-import { HardHat, LayoutDashboard, ShieldCheck, LogOut, ExternalLink, Languages, GitBranch, X, History } from "lucide-react";
+import { HardHat, LayoutDashboard, ShieldCheck, LogOut, ExternalLink, Languages, GitBranch, X, History, Landmark } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import WorkerView from "../components/WorkerView";
 import ContractorView from "../components/ContractorView";
+import BuilderView from "../components/BuilderView";
 import ArmorPayGate from "../components/ArmorPayGate";
 import Toast from "../components/Toast";
 import {
@@ -20,13 +21,10 @@ export default function Dashboard({ view }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Strict role-based guards (RBAC)
+  // Strict role-based guards (RBAC) - complete view segregation
   if (!user) return <Navigate to="/login" replace />;
-  if (view === "worker" && user.role !== "worker") {
-    return <Navigate to="/contractor" replace />;
-  }
-  if (view === "contractor" && user.role !== "contractor") {
-    return <Navigate to="/worker" replace />;
+  if (view !== user.role) {
+    return <Navigate to={`/${user.role}`} replace />;
   }
 
   const [lang, setLang] = useState(() => {
@@ -39,9 +37,12 @@ export default function Dashboard({ view }) {
     setToast({ message, type });
   };
 
+  const LANG_ORDER = ["en", "hi", "ta", "bn"];
+  const LANG_LABELS = { en: "English", hi: "हिंदी", ta: "தமிழ்", bn: "বাংলা" };
   const toggleLang = () => {
     setLang((prev) => {
-      const next = prev === "en" ? "hi" : "en";
+      const idx = LANG_ORDER.indexOf(prev);
+      const next = LANG_ORDER[(idx + 1) % LANG_ORDER.length];
       localStorage.setItem("buildsafe_lang", next);
       return next;
     });
@@ -79,6 +80,31 @@ export default function Dashboard({ view }) {
     }
   });
 
+  const [contractors, setContractors] = useState(() => {
+    try {
+      const stored = localStorage.getItem("buildsafe_contractors");
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    const initial = [
+      {
+        id: "usr-contractor-1",
+        name: "Rajesh Sharma",
+        email: "contractor@buildsafe.in",
+        projectId: "PRJ-101",
+        masterBudget: 500000,
+      },
+      {
+        id: "usr-contractor-2",
+        name: "Vikram Singh",
+        email: "vikram@buildsafe.in",
+        projectId: "PRJ-102",
+        masterBudget: 300000,
+      }
+    ];
+    localStorage.setItem("buildsafe_contractors", JSON.stringify(initial));
+    return initial;
+  });
+
   const [activeWorkerId, setActiveWorkerId] = useState(() => {
     if (user.workerId) return user.workerId;
     return workers[0]?.id || "";
@@ -94,6 +120,10 @@ export default function Dashboard({ view }) {
   useEffect(() => {
     localStorage.setItem("buildsafe_projects", JSON.stringify(projects));
   }, [projects]);
+
+  useEffect(() => {
+    localStorage.setItem("buildsafe_contractors", JSON.stringify(contractors));
+  }, [contractors]);
 
   useEffect(() => {
     localStorage.setItem("buildsafe_chain", JSON.stringify(chain));
@@ -190,6 +220,8 @@ export default function Dashboard({ view }) {
       seed();
     }
   }, []);
+   const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
+  const project = projects.find((p) => p.id === worker?.projectId);
 
   // Sync lastPayout from chain if state is null but chain has today's payout
   useEffect(() => {
@@ -204,8 +236,7 @@ export default function Dashboard({ view }) {
     }
   }, [chain, worker, lastPayout]);
 
-  const worker = workers.find((w) => w.id === activeWorkerId) || workers[0];
-  const project = projects.find((p) => p.id === worker?.projectId);
+ 
 
   const syncLedgerToNotion = async (updatedChain) => {
     if (!notionStatus.connected) return;
@@ -217,6 +248,48 @@ export default function Dashboard({ view }) {
     setActiveWorkerId(id);
     setLastPayout(null);
     setPolicyResult(null);
+  };
+
+  const handleAddContractor = async (name, email, projectId, masterBudget) => {
+    const id = `usr-contractor-${Date.now()}`;
+    const newContractor = {
+      id,
+      name,
+      email: email.toLowerCase(),
+      projectId,
+      masterBudget: Number(masterBudget),
+    };
+    
+    setContractors((prev) => [...prev, newContractor]);
+    
+    // Stage contractor user profile in buildsafe_users
+    try {
+      const storedUsers = localStorage.getItem("buildsafe_users");
+      const users = storedUsers ? JSON.parse(storedUsers) : [];
+      if (!users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        users.push({
+          id,
+          email: email.toLowerCase(),
+          password: "demo123",
+          name,
+          role: "contractor",
+        });
+        localStorage.setItem("buildsafe_users", JSON.stringify(users));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    
+    // Add to blockchain
+    const updated = await appendToChain(chain, "CONTRACTOR_ONBOARDED", {
+      contractorId: id,
+      contractorName: name,
+      projectId,
+      masterBudget: Number(masterBudget),
+    });
+    setChain(updated);
+    syncLedgerToNotion(updated);
+    showToast(`Contractor "${name}" onboarded & credentials created`, "success");
   };
 
   const handleScanComplete = async () => {
@@ -386,7 +459,7 @@ export default function Dashboard({ view }) {
               title="Toggle Language / भाषा बदलें"
               className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/20 text-tarpLight border border-tarp/30 rounded-full px-2.5 py-1 transition-all hover:scale-[1.01] active:scale-[0.99]"
             >
-              <Languages size={11} className="text-safety" /> {lang === "en" ? "हिंदी" : "English"}
+              <Languages size={11} className="text-safety" /> {LANG_LABELS[LANG_ORDER[(LANG_ORDER.indexOf(lang) + 1) % LANG_ORDER.length]]}
             </button>
             <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[120px]">
               {user.name}
@@ -395,6 +468,10 @@ export default function Dashboard({ view }) {
               {user.role === "worker" ? (
                 <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
                   <HardHat size={14} /> Worker
+                </span>
+              ) : user.role === "builder" ? (
+                <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-tarp text-white">
+                  <Landmark size={14} /> Builder
                 </span>
               ) : (
                 <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
@@ -442,6 +519,16 @@ export default function Dashboard({ view }) {
             onRaiseDispute={handleRaiseDispute}
             openDisputeForWorker={openDisputeForWorker}
           />
+        ) : view === "builder" ? (
+          <BuilderView
+            chain={chain}
+            workers={workers}
+            projects={projects}
+            contractors={contractors}
+            onAddContractor={handleAddContractor}
+            notionStatus={notionStatus}
+            lang={lang}
+          />
         ) : (
           <ContractorView
             chain={chain}
@@ -454,6 +541,7 @@ export default function Dashboard({ view }) {
             onCreateProject={handleCreateProject}
             onAddWorker={handleAddWorker}
             notionStatus={notionStatus}
+            lang={lang}
           />
         )}
       </main>

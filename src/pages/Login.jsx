@@ -18,7 +18,7 @@ export default function Login() {
   const [newPassword, setNewPassword] = useState("");
 
   if (loading) return null;
-  if (user) return <Navigate to={user.role === "contractor" ? "/contractor" : "/worker"} replace />;
+ if (user) return <Navigate to={`/${user.role}`} replace />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       const session = await login(email, password);
-      navigate(session.role === "contractor" ? "/contractor" : "/worker");
+     navigate(`/${session.role}`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -311,6 +311,19 @@ export default function Login() {
                 <div>
                   <span className="font-semibold">Sunita Devi</span>
                   <p className="text-[10px] text-steel font-normal">Worker · Helper (₹480/day)</p>
+                </div>
+                <span className="text-[10px] text-tarp font-mono font-bold">Sign In →</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleQuickLogin("builder@buildsafe.in", "demo123")}
+                className="w-full flex items-center justify-between text-left text-xs bg-cement hover:bg-cement2 transition-all border border-bitumen/10 p-2.5 rounded-lg font-medium text-bitumen hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <div>
+                  <span className="font-semibold">Amit Verma</span>
+                  <p className="text-[10px] text-steel font-normal">Builder (Metro Operations)</p>
                 </div>
                 <span className="text-[10px] text-tarp font-mono font-bold">Sign In →</span>
               </button>
