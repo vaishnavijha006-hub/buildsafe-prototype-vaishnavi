@@ -1,15 +1,22 @@
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 
+/**
+ * Root handler:
+ *   - Loading  → nothing (avoids flash)
+ *   - Logged in → straight to their role dashboard
+ *   - Not logged in → Landing page (never /login directly from root)
+ */
 function RootRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={`/${user.role}`} replace />;
+  if (user) return <Navigate to={`/${user.role}`} replace />;
+  return <Landing />;
 }
 
 export default function App() {

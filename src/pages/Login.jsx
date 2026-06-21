@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { HardHat, LogIn, AlertCircle, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const { login, user, loading, resetPassword } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const location = useLocation();
+  const prefill = location.state?.prefillEmail || "";
+  const [email, setEmail] = useState(prefill);
+  const [password, setPassword] = useState(prefill ? "demo123" : "");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,7 +41,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       const session = await login(demoEmail, demoPassword);
-      navigate(session.role === "contractor" ? "/contractor" : "/worker");
+      navigate(`/${session.role}`);
     } catch (err) {
       setError(err.message);
     } finally {

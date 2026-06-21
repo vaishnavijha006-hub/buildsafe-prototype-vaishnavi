@@ -71,3 +71,21 @@ body { margin: 0; font-family: 'Inter', sans-serif; }
 button, select, input, textarea, a {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Landing page entrance animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.fade-up-1 { animation: fadeUp 0.55s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fade-up-2 { animation: fadeUp 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fade-up-3 { animation: fadeUp 0.55s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fade-up-4 { animation: fadeUp 0.55s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Subtle float for hero stat numbers */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+.float-y { animation: floatY 4s ease-in-out infinite; }
