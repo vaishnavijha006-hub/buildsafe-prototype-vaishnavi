@@ -459,7 +459,7 @@ export default function Dashboard({ view }) {
               title="Toggle Language / भाषा बदलें"
               className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/20 text-tarpLight border border-tarp/30 rounded-full px-2.5 py-1 transition-all hover:scale-[1.01] active:scale-[0.99]"
             >
-              <Languages size={11} className="text-safety" /> {LANG_LABELS[LANG_ORDER[(LANG_ORDER.indexOf(lang) + 1) % LANG_ORDER.length]]}
+              <Languages size={11} className="text-safety" /> {LANG_LABELS[lang]}
             </button>
             <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[120px]">
               {user.name}
