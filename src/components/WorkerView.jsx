@@ -187,9 +187,9 @@ export default function WorkerView({
             <ShieldCheck size={20} className="text-tarpLight" />
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/10 pt-3">
-          <span className="font-mono text-xs text-steel">{worker.id}</span>
-          <span className="font-mono text-xs text-steel">₹{worker.dailyWage}/day</span>
+        <div className="flex items-center justify-between border-t border-white/10 pt-3 gap-2">
+          <span className="font-mono text-xs text-steel truncate min-w-0">{worker.id}</span>
+          <span className="font-mono text-xs text-steel shrink-0">₹{worker.dailyWage}/day</span>
         </div>
         <div className="absolute -bottom-2 left-0 right-0 flex justify-around px-4">
           {Array.from({ length: 10 }).map((_, i) => (
@@ -327,7 +327,7 @@ export default function WorkerView({
           {!showDisputeForm && (
             <button
               onClick={() => setShowDisputeForm(true)}
-              className="text-[10px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/5 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="text-[10px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/10 hover:border-rust/60 hover:scale-[1.02] active:scale-[0.97] active:bg-rust/20 transition-all duration-150 shadow-sm"
             >
               {t.raiseDispute}
             </button>
@@ -348,7 +348,7 @@ export default function WorkerView({
                 setDisputeReason("");
                 setShowDisputeForm(false);
               }}
-              className="w-full bg-rust disabled:opacity-40 text-white text-xs font-display py-2.5 rounded-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
+              className="w-full bg-rust disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display py-2.5 rounded-lg hover:bg-rust/90 hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150"
             >
               {t.submitDispute}
             </button>
@@ -374,23 +374,35 @@ export default function WorkerView({
 
       {showHistory && (
         <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mt-3 chain-drop shadow-sm">
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="text-center">
-              <p className="font-display text-lg text-bitumen">{history.attendanceDays}</p>
-              <p className="text-[10px] text-steel">{t.daysVerified}</p>
+          {history.attendanceDays === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
+              <div className="bg-bitumen/5 p-3 rounded-full">
+                <History size={18} className="text-steel" />
+              </div>
+              <p className="font-display text-xs text-bitumen">No work history yet</p>
+              <p className="text-[10px] text-steel max-w-[220px]">Mark attendance to start building your portable work record.</p>
             </div>
-            <div className="text-center">
-              <p className="font-display text-lg text-bitumen">₹{history.totalEarned}</p>
-              <p className="text-[10px] text-steel">{t.totalEarned}</p>
-            </div>
-            <div className="text-center">
-              <p className="font-display text-lg text-bitumen">{history.disputesRaised}</p>
-              <p className="text-[10px] text-steel">{t.disputesCount}</p>
-            </div>
-          </div>
-          <p className="text-[10px] text-steel flex items-center gap-1.5 border-t border-bitumen/10 pt-3">
-            <Briefcase size={12} className="shrink-0" /> {t.historyDesc}
-          </p>
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="text-center">
+                  <p className="font-display text-lg text-bitumen">{history.attendanceDays}</p>
+                  <p className="text-[10px] text-steel">{t.daysVerified}</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-display text-lg text-bitumen">₹{history.totalEarned}</p>
+                  <p className="text-[10px] text-steel">{t.totalEarned}</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-display text-lg text-bitumen">{history.disputesRaised}</p>
+                  <p className="text-[10px] text-steel">{t.disputesCount}</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-steel flex items-center gap-1.5 border-t border-bitumen/10 pt-3">
+                <Briefcase size={12} className="shrink-0" /> {t.historyDesc}
+              </p>
+            </>
+          )}
         </div>
       )}
 

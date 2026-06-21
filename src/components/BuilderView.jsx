@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { 
   Users, Landmark, ShieldCheck, AlertTriangle, Plus, X, 
-  TrendingUp, Activity, CheckCircle2, Link2, ExternalLink 
+  TrendingUp, Activity, CheckCircle2, Link2, BarChart3
 } from "lucide-react";
 import { getOpenDisputes, detectAnomalies, verifyChain } from "../lib/ledger";
 
@@ -20,13 +20,15 @@ const dict = {
     locked: "locked",
     of: "of",
     multiContractorOps: "Multi-Contractor Operations",
+    noContractorsYet: "No contractors enrolled yet",
+    noContractorsDesc: "Onboard a contractor above to begin multi-site oversight.",
     thContractor: "Contractor",
     thSiteProject: "Site / Project",
-    thActiveWorkers: "Active Workers",
-    thDisbursedWages: "Disbursed Wages",
+    thActiveWorkers: "Workers",
+    thDisbursedWages: "Disbursed",
     thDisputes: "Disputes",
     thCompliance: "Compliance",
-    anomalyFlagged: "⚠ Anomaly Flagged",
+    anomalyFlagged: "⚠ Anomaly",
     compliant: "✓ Compliant",
     complianceFraud: "Compliance & Fraud Patterns (Rollup)",
     anomalyFlagLabel: "ANOMALY FLAG",
@@ -70,13 +72,15 @@ const dict = {
     locked: "लॉक",
     of: "का",
     multiContractorOps: "बहु-ठेकेदार संचालन",
+    noContractorsYet: "अभी कोई ठेकेदार नहीं",
+    noContractorsDesc: "बहु-साइट निगरानी शुरू करने के लिए ऊपर ठेकेदार जोड़ें।",
     thContractor: "ठेकेदार",
     thSiteProject: "साइट / परियोजना",
-    thActiveWorkers: "सक्रिय कर्मचारी",
-    thDisbursedWages: "वितरित मज़दूरी",
+    thActiveWorkers: "कर्मचारी",
+    thDisbursedWages: "वितरित",
     thDisputes: "विवाद",
     thCompliance: "अनुपालन",
-    anomalyFlagged: "⚠ विसंगति चिह्नित",
+    anomalyFlagged: "⚠ विसंगति",
     compliant: "✓ अनुपालक",
     complianceFraud: "अनुपालन और धोखाधड़ी पैटर्न (रोलअप)",
     anomalyFlagLabel: "विसंगति चिह्न",
@@ -120,13 +124,15 @@ const dict = {
     locked: "பூட்டப்பட்டது",
     of: "இல்",
     multiContractorOps: "பல-ஒப்பந்ததாரர் நடவடிக்கைகள்",
+    noContractorsYet: "இன்னும் ஒப்பந்ததாரர்கள் இல்லை",
+    noContractorsDesc: "பல-தள கண்காணிப்பு தொடங்க மேலே ஒப்பந்ததாரர் சேர்க்கவும்.",
     thContractor: "ஒப்பந்ததாரர்",
     thSiteProject: "தளம் / திட்டம்",
-    thActiveWorkers: "செயலில் தொழிலாளர்",
-    thDisbursedWages: "வழங்கிய கூலி",
+    thActiveWorkers: "தொழிலாளர்கள்",
+    thDisbursedWages: "வழங்கியது",
     thDisputes: "தகராறுகள்",
     thCompliance: "இணக்கம்",
-    anomalyFlagged: "⚠ முரண்பாடு குறிக்கப்பட்டது",
+    anomalyFlagged: "⚠ முரண்பாடு",
     compliant: "✓ இணக்கமானது",
     complianceFraud: "இணக்கம் & மோசடி வடிவங்கள் (தொகுப்பு)",
     anomalyFlagLabel: "முரண்பாடு குறி",
@@ -170,13 +176,15 @@ const dict = {
     locked: "লক",
     of: "এর",
     multiContractorOps: "বহু-ঠিকাদার কার্যক্রম",
+    noContractorsYet: "এখনও কোনো ঠিকাদার নেই",
+    noContractorsDesc: "বহু-সাইট তদারকি শুরু করতে উপরে ঠিকাদার যুক্ত করুন।",
     thContractor: "ঠিকাদার",
     thSiteProject: "সাইট / প্রকল্প",
-    thActiveWorkers: "সক্রিয় শ্রমিক",
-    thDisbursedWages: "বিতরিত মজুরি",
+    thActiveWorkers: "শ্রমিক",
+    thDisbursedWages: "বিতরিত",
     thDisputes: "বিরোধ",
     thCompliance: "সম্মতি",
-    anomalyFlagged: "⚠ অসামঞ্জস্য চিহ্নিত",
+    anomalyFlagged: "⚠ অসামঞ্জস্য",
     compliant: "✓ সম্মত",
     complianceFraud: "সম্মতি ও জালিয়াতি ধরন (সারাংশ)",
     anomalyFlagLabel: "অসামঞ্জস্য চিহ্ন",
@@ -224,13 +232,9 @@ export default function BuilderView({
     verifyChain(chain).then(setChainStatus);
   }, [chain]);
 
-  // Aggregate stats
   const totalAllocated = projects.reduce((sum, p) => sum + p.wageLocked, 0);
   const totalMasterBudget = contractors.reduce((sum, c) => sum + c.masterBudget, 0);
-  const totalDisbursed = chain
-    .filter((b) => b.type === "PAYOUT")
-    .reduce((sum, b) => sum + b.data.amount, 0);
-  
+
   const openDisputes = getOpenDisputes(chain);
   const anomalies = detectAnomalies(chain);
 
@@ -238,82 +242,76 @@ export default function BuilderView({
     e.preventDefault();
     if (!name.trim() || !email.trim() || !projectId || !budget) return;
     onAddContractor(name.trim(), email.trim(), projectId, Number(budget));
-    setName("");
-    setEmail("");
-    setBudget("");
-    setShowForm(false);
+    setName(""); setEmail(""); setBudget(""); setShowForm(false);
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-5">
       {/* Action Header */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-lg text-bitumen leading-none font-bold">{t.builderOps}</h2>
           <p className="text-xs text-steel font-mono mt-1">{t.builderSubtitle}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-tarp text-white text-xs font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shrink-0"
+          className="flex items-center gap-2 bg-tarp text-white text-xs font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:shadow-lg hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150 shadow-md shrink-0"
         >
           <Plus size={14} /> {t.onboardContractor}
         </button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10 shadow-sm">
+      {/* Stats Grid — 2 cols on mobile, 4 on md+ */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
           <Landmark size={16} className="text-tarp mb-2" />
-          <p className="font-display text-xl text-bitumen">₹{totalMasterBudget.toLocaleString("en-IN")}</p>
+          <p className="font-display text-lg sm:text-xl text-bitumen">₹{totalMasterBudget.toLocaleString("en-IN")}</p>
           <p className="text-[10px] text-steel">{t.masterBudget}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10 shadow-sm">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
           <TrendingUp size={16} className="text-safety mb-2" />
-          <p className="font-display text-xl text-bitumen">₹{totalAllocated.toLocaleString("en-IN")}</p>
+          <p className="font-display text-lg sm:text-xl text-bitumen">₹{totalAllocated.toLocaleString("en-IN")}</p>
           <p className="text-[10px] text-steel font-mono">{t.lockedOnChain}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10 shadow-sm">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
           <Users size={16} className="text-steel mb-2" />
-          <p className="font-display text-xl text-bitumen">{workers.length}</p>
+          <p className="font-display text-lg sm:text-xl text-bitumen">{workers.length}</p>
           <p className="text-[10px] text-steel">{t.crewsEnrolled}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10 shadow-sm">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
           <Activity size={16} className="text-rust mb-2" />
-          <p className="font-display text-xl text-bitumen">{anomalies.length}</p>
+          <p className="font-display text-lg sm:text-xl text-bitumen">{anomalies.length}</p>
           <p className="text-[10px] text-steel">{t.riskAnomalyFlags}</p>
         </div>
       </div>
 
-      {/* Master Wage Budget Drawdown Progress */}
-      <div className="bg-white rounded-2xl border border-bitumen/10 p-5 shadow-sm space-y-4">
+      {/* Master Wage Budget Drawdown */}
+      <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm space-y-4">
         <h3 className="font-display text-sm text-bitumen flex items-center gap-2">
           <Landmark size={16} className="text-tarp" />
           <span>{t.masterWageLock}</span>
         </h3>
-        
         <div className="space-y-4 divide-y divide-bitumen/5">
           {projects.map((p) => {
             const projectContractor = contractors.find((c) => c.projectId === p.id);
             const budgetMax = projectContractor ? projectContractor.masterBudget : 300000;
             const percent = Math.min(100, Math.round((p.wageLocked / budgetMax) * 100));
-            
             return (
               <div key={p.id} className="pt-3 first:pt-0 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-bitumen">{p.name}</span>
+                <div className="flex flex-wrap items-start justify-between gap-1 text-xs">
+                  <div className="min-w-0">
+                    <span className="font-bold text-bitumen block truncate">{p.name}</span>
                     <p className="text-[10px] text-steel font-mono">
                       {t.contractorLabel}: {projectContractor?.name || t.unassigned}
                     </p>
                   </div>
-                  <span className="font-mono font-semibold text-bitumen">
+                  <span className="font-mono font-semibold text-bitumen text-right shrink-0 text-[11px]">
                     ₹{p.wageLocked.toLocaleString("en-IN")} {t.of} ₹{budgetMax.toLocaleString("en-IN")} {t.locked} ({percent}%)
                   </span>
                 </div>
-                {/* Progress bar */}
-                <div className="w-full h-3 bg-cement rounded-full overflow-hidden border border-bitumen/5">
-                  <div 
-                    className={`h-full transition-all duration-500 rounded-full ${
+                <div className="w-full h-2.5 bg-cement rounded-full overflow-hidden border border-bitumen/5">
+                  <div
+                    className={`h-full transition-all duration-700 rounded-full ${
                       percent > 85 ? "bg-rust" : percent > 50 ? "bg-tarp" : "bg-safety"
                     }`}
                     style={{ width: `${percent}%` }}
@@ -325,85 +323,92 @@ export default function BuilderView({
         </div>
       </div>
 
-      {/* Multi-Contractor rollups */}
-      <div className="bg-white rounded-2xl border border-bitumen/10 p-5 shadow-sm">
+      {/* Multi-Contractor table */}
+      <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm">
         <h3 className="font-display text-sm text-bitumen mb-3 flex items-center gap-2">
           <Users size={16} /> {t.multiContractorOps}
         </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
-                <th className="py-2.5">{t.thContractor}</th>
-                <th className="py-2.5">{t.thSiteProject}</th>
-                <th className="py-2.5 text-center">{t.thActiveWorkers}</th>
-                <th className="py-2.5 text-right">{t.thDisbursedWages}</th>
-                <th className="py-2.5 text-center">{t.thDisputes}</th>
-                <th className="py-2.5 text-center">{t.thCompliance}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-bitumen/5">
-              {contractors.map((c) => {
-                const proj = projects.find((p) => p.id === c.projectId);
-                const activeWorkers = workers.filter((w) => w.projectId === c.projectId);
-                
-                // wages paid
-                const payouts = chain
-                  .filter((b) => b.type === "PAYOUT" && activeWorkers.some((w) => w.id === b.data.workerId))
-                  .reduce((sum, b) => sum + b.data.amount, 0);
-
-                // disputes
-                const contractorDisputes = openDisputes.filter((d) => 
-                  activeWorkers.some((w) => w.id === d.data.workerId)
-                ).length;
-
-                // check if anomaly flags exist for their workers
-                const hasAnomalies = anomalies.some((a) => {
-                  const b0 = chain[a.blocks[0]];
-                  const b1 = chain[a.blocks[1]];
+        {contractors.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+            <div className="bg-bitumen/5 p-3 rounded-full">
+              <Users size={22} className="text-steel" />
+            </div>
+            <p className="font-display text-xs text-bitumen">{t.noContractorsYet}</p>
+            <p className="text-[10px] text-steel max-w-[260px]">{t.noContractorsDesc}</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-tarp border border-tarp/30 rounded-full px-3 py-1.5 hover:bg-tarp/5 hover:border-tarp/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
+            >
+              <Plus size={12} /> {t.onboardContractor}
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto -mx-1">
+            <table className="w-full min-w-[520px] text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
+                  <th className="py-2.5 px-1">{t.thContractor}</th>
+                  <th className="py-2.5 px-1 hidden sm:table-cell">{t.thSiteProject}</th>
+                  <th className="py-2.5 px-1 text-center">{t.thActiveWorkers}</th>
+                  <th className="py-2.5 px-1 text-right">{t.thDisbursedWages}</th>
+                  <th className="py-2.5 px-1 text-center">{t.thDisputes}</th>
+                  <th className="py-2.5 px-1 text-center">{t.thCompliance}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-bitumen/5">
+                {contractors.map((c) => {
+                  const proj = projects.find((p) => p.id === c.projectId);
+                  const activeWorkers = workers.filter((w) => w.projectId === c.projectId);
+                  const payouts = chain
+                    .filter((b) => b.type === "PAYOUT" && activeWorkers.some((w) => w.id === b.data.workerId))
+                    .reduce((sum, b) => sum + b.data.amount, 0);
+                  const contractorDisputes = openDisputes.filter((d) =>
+                    activeWorkers.some((w) => w.id === d.data.workerId)
+                  ).length;
+                  const hasAnomalies = anomalies.some((a) => {
+                    const b0 = chain[a.blocks[0]];
+                    const b1 = chain[a.blocks[1]];
+                    return (
+                      (b0 && activeWorkers.some((w) => w.id === b0.data.workerId)) ||
+                      (b1 && activeWorkers.some((w) => w.id === b1.data.workerId))
+                    );
+                  });
                   return (
-                    (b0 && activeWorkers.some((w) => w.id === b0.data.workerId)) ||
-                    (b1 && activeWorkers.some((w) => w.id === b1.data.workerId))
+                    <tr key={c.id} className="hover:bg-bitumen/[0.015] transition-colors">
+                      <td className="py-3 px-1 font-semibold text-bitumen">
+                        <div className="truncate max-w-[110px]">{c.name}</div>
+                        <div className="font-mono text-[9px] text-steel truncate max-w-[110px]">{c.email}</div>
+                      </td>
+                      <td className="py-3 px-1 text-steel hidden sm:table-cell truncate max-w-[120px]">{proj?.name || "—"}</td>
+                      <td className="py-3 px-1 text-center font-mono">{activeWorkers.length}</td>
+                      <td className="py-3 px-1 text-right font-mono font-medium text-tarp">₹{payouts.toLocaleString("en-IN")}</td>
+                      <td className="py-3 px-1 text-center">
+                        <span className={`font-mono px-2 py-0.5 rounded-full text-[10px] ${
+                          contractorDisputes > 0 ? "bg-rust/10 text-rust font-bold" : "bg-cement text-steel"
+                        }`}>
+                          {contractorDisputes}
+                        </span>
+                      </td>
+                      <td className="py-3 px-1 text-center">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium font-mono ${
+                          hasAnomalies ? "bg-rust/10 text-rust" : "bg-tarp/10 text-tarp"
+                        }`}>
+                          {hasAnomalies ? t.anomalyFlagged : t.compliant}
+                        </span>
+                      </td>
+                    </tr>
                   );
-                });
-
-                return (
-                  <tr key={c.id} className="hover:bg-bitumen/[0.01] transition-colors">
-                    <td className="py-3 font-semibold text-bitumen">
-                      <div>{c.name}</div>
-                      <div className="font-mono text-[9px] text-steel">{c.email}</div>
-                    </td>
-                    <td className="py-3 text-steel">{proj?.name || "—"}</td>
-                    <td className="py-3 text-center font-mono">{activeWorkers.length}</td>
-                    <td className="py-3 text-right font-mono font-medium text-tarp">₹{payouts.toLocaleString("en-IN")}</td>
-                    <td className="py-3 text-center">
-                      <span className={`font-mono px-2 py-0.5 rounded-full text-[10px] ${
-                        contractorDisputes > 0 ? "bg-rust/10 text-rust font-bold" : "bg-cement text-steel"
-                      }`}>
-                        {contractorDisputes}
-                      </span>
-                    </td>
-                    <td className="py-3 text-center">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium font-mono ${
-                        hasAnomalies 
-                          ? "bg-rust/10 text-rust" 
-                          : "bg-tarp/10 text-tarp"
-                      }`}>
-                        {hasAnomalies ? t.anomalyFlagged : t.compliant}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Compliance Rollup & Anomaly Patterns */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Anomaly Pattern Detection */}
-        <div className="bg-white rounded-2xl border border-bitumen/10 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm">
           <p className="font-display text-xs text-rust flex items-center gap-1.5 mb-3 font-bold">
             <AlertTriangle size={14} /> {t.complianceFraud}
           </p>
@@ -417,19 +422,18 @@ export default function BuilderView({
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center text-xs text-steel border border-dashed border-bitumen/10 rounded-xl">
+            <div className="p-6 text-center text-xs text-steel border border-dashed border-bitumen/10 rounded-xl">
               <CheckCircle2 size={20} className="text-tarp mx-auto mb-2" />
               <span>{t.noAnomalies}</span>
             </div>
           )}
         </div>
 
-        {/* Ledger Integrity & rollup summary */}
-        <div className="bg-white rounded-2xl border border-bitumen/10 p-5 shadow-sm space-y-4">
+        {/* Ledger Integrity summary */}
+        <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm space-y-4">
           <p className="font-display text-xs text-bitumen flex items-center gap-1.5 font-bold">
             <Link2 size={14} className="text-tarp" /> {t.cryptoIntegrity}
           </p>
-          
           <div className="bg-bitumen text-cement rounded-xl p-4 space-y-3 font-mono text-[10px]">
             <div className="flex justify-between items-center pb-2 border-b border-white/10">
               <span className="text-steel">{t.chainHealth}</span>
@@ -445,7 +449,6 @@ export default function BuilderView({
               </p>
             </div>
           </div>
-          
           {chainStatus && (
             <div className="flex items-center gap-2 justify-center text-xs font-mono">
               {chainStatus.valid ? (
@@ -462,17 +465,19 @@ export default function BuilderView({
         </div>
       </div>
 
-      {/* Onboard Contractor Modal Form */}
+      {/* Onboard Contractor Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-bitumen/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-bitumen/10 chain-drop">
+        <div className="fixed inset-0 bg-bitumen/80 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full p-6 shadow-2xl border border-bitumen/10 chain-drop">
             <div className="flex items-center justify-between border-b border-bitumen/10 pb-3 mb-4">
               <h3 className="font-display text-sm text-bitumen font-bold">{t.onboardTitle}</h3>
-              <button onClick={() => setShowForm(false)} className="text-steel hover:text-bitumen">
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-all"
+              >
                 <X size={18} />
               </button>
             </div>
-            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-bitumen mb-1.5">{t.contractorName}</label>
@@ -481,10 +486,9 @@ export default function BuilderView({
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t.contractorNamePlaceholder}
                   required
-                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
                 />
               </div>
-
               <div>
                 <label className="block text-xs font-medium text-bitumen mb-1.5">{t.emailLabel}</label>
                 <input
@@ -493,24 +497,22 @@ export default function BuilderView({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.emailPlaceholder}
                   required
-                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-bitumen mb-1.5">{t.assignedProject}</label>
                   <select
                     value={projectId}
                     onChange={(e) => setProjectId(e.target.value)}
-                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety bg-white"
+                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 bg-white transition-all"
                   >
                     {projects.map((p) => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-xs font-medium text-bitumen mb-1.5">{t.allocationBudget}</label>
                   <input
@@ -519,18 +521,16 @@ export default function BuilderView({
                     onChange={(e) => setBudget(e.target.value)}
                     placeholder={t.budgetPlaceholder}
                     required
-                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
                   />
                 </div>
               </div>
-
               <p className="text-[10px] text-steel leading-relaxed">
                 {t.onboardDesc} <span className="font-mono font-bold text-bitumen">demo123</span>.
               </p>
-
               <button
                 type="submit"
-                className="w-full bg-tarp text-white text-xs font-display py-3 rounded-lg hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md"
+                className="w-full bg-tarp text-white text-xs font-display py-3 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
               >
                 {t.recordOnChain}
               </button>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Link2, ShieldCheck, ShieldAlert, Users, IndianRupee, Activity,
   ChevronDown, ChevronUp, AlertTriangle, Plus, X, CheckCircle2, XCircle,
+  FileText,
 } from "lucide-react";
 import { verifyChain, getOpenDisputes, detectAnomalies } from "../lib/ledger";
 
@@ -30,7 +31,8 @@ const dict = {
     chainVerified: "Chain verified",
     tamperedAt: "Tampered at",
     activeWorkersRoster: "Active Workers Roster",
-    noWorkersYet: "No workers onboarded to this project yet.",
+    noWorkersYet: "No workers onboarded yet",
+    noWorkersDesc: "Add a new worker above to start building the crew roster for this project.",
     thWorker: "Worker",
     thRole: "Role",
     thContact: "Contact",
@@ -46,8 +48,8 @@ const dict = {
     noDisputesDesc: "All worker attendance records are aligned. No wage claims are currently flagged as contested.",
     workLedger: "Work Ledger",
     tryTampering: "⚠ Try tampering (demo)",
-    ledgerEmpty: "Ledger is empty",
-    ledgerEmptyDesc: "No blocks have been written to the ledger yet. Worker attendance check-ins will generate the first blocks.",
+    ledgerEmpty: "No blocks yet",
+    ledgerEmptyDesc: "Mark attendance to begin writing the immutable ledger.",
   },
   hi: {
     addWorker: "नया कर्मचारी जोड़ें",
@@ -73,7 +75,8 @@ const dict = {
     chainVerified: "चेन सत्यापित",
     tamperedAt: "छेड़छाड़ ब्लॉक",
     activeWorkersRoster: "सक्रिय कर्मचारी सूची",
-    noWorkersYet: "अभी तक इस परियोजना में कोई कर्मचारी नहीं जोड़ा गया।",
+    noWorkersYet: "अभी कोई कर्मचारी नहीं",
+    noWorkersDesc: "इस परियोजना में क्रू रोस्टर शुरू करने के लिए ऊपर नया कर्मचारी जोड़ें।",
     thWorker: "कर्मचारी",
     thRole: "भूमिका",
     thContact: "संपर्क",
@@ -89,8 +92,8 @@ const dict = {
     noDisputesDesc: "सभी कर्मचारी उपस्थिति रिकॉर्ड संरेखित हैं। कोई मज़दूरी दावा वर्तमान में विवादित नहीं है।",
     workLedger: "कार्य बहीखाता",
     tryTampering: "⚠ छेड़छाड़ करें (डेमो)",
-    ledgerEmpty: "बहीखाता खाली है",
-    ledgerEmptyDesc: "बहीखाते में अभी तक कोई ब्लॉक नहीं लिखा गया। कर्मचारी उपस्थिति चेक-इन पहले ब्लॉक उत्पन्न करेंगे।",
+    ledgerEmpty: "अभी कोई ब्लॉक नहीं",
+    ledgerEmptyDesc: "अपरिवर्तनीय बहीखाता शुरू करने के लिए उपस्थिति दर्ज करें।",
   },
   ta: {
     addWorker: "புதிய தொழிலாளர் சேர்க்கவும்",
@@ -116,7 +119,8 @@ const dict = {
     chainVerified: "சங்கிலி சரிபார்க்கப்பட்டது",
     tamperedAt: "சீர்குலைக்கப்பட்டது",
     activeWorkersRoster: "செயலில் உள்ள தொழிலாளர் பட்டியல்",
-    noWorkersYet: "இந்தத் திட்டத்தில் இதுவரை தொழிலாளர்கள் சேர்க்கப்படவில்லை.",
+    noWorkersYet: "இதுவரை தொழிலாளர்கள் இல்லை",
+    noWorkersDesc: "இந்தத் திட்டத்தில் குழுவை தொடங்க மேலே புதிய தொழிலாளரை சேர்க்கவும்.",
     thWorker: "தொழிலாளர்",
     thRole: "பணி",
     thContact: "தொடர்பு",
@@ -132,8 +136,8 @@ const dict = {
     noDisputesDesc: "அனைத்து தொழிலாளர் வருகை பதிவுகளும் சீரமைக்கப்பட்டுள்ளன. எந்த கூலி கோரிக்கையும் தற்போது மறுக்கப்படவில்லை.",
     workLedger: "பணி பேரேடு",
     tryTampering: "⚠ சீர்குலைக்க முயற்சிக்கவும் (டெமோ)",
-    ledgerEmpty: "பேரேடு காலியாக உள்ளது",
-    ledgerEmptyDesc: "பேரேட்டில் இதுவரை எந்த தொகுதிகளும் எழுதப்படவில்லை. தொழிலாளர் வருகை பதிவு முதல் தொகுதிகளை உருவாக்கும்.",
+    ledgerEmpty: "இன்னும் தொகுதிகள் இல்லை",
+    ledgerEmptyDesc: "மாற்ற முடியாத பேரேட்டை தொடங்க வருகையை பதிவு செய்யுங்கள்.",
   },
   bn: {
     addWorker: "নতুন শ্রমিক যোগ করুন",
@@ -159,7 +163,8 @@ const dict = {
     chainVerified: "চেইন যাচাইকৃত",
     tamperedAt: "পরিবর্তন করা হয়েছে",
     activeWorkersRoster: "সক্রিয় শ্রমিক তালিকা",
-    noWorkersYet: "এই প্রকল্পে এখনও কোনো শ্রমিক যোগ করা হয়নি।",
+    noWorkersYet: "এখনও কোনো শ্রমিক নেই",
+    noWorkersDesc: "এই প্রকল্পের দল শুরু করতে উপরে নতুন শ্রমিক যোগ করুন।",
     thWorker: "শ্রমিক",
     thRole: "পদবী",
     thContact: "যোগাযোগ",
@@ -175,8 +180,8 @@ const dict = {
     noDisputesDesc: "সমস্ত শ্রমিকের উপস্থিতি নথি সামঞ্জস্যপূর্ণ। কোনো মজুরি দাবি বর্তমানে বিতর্কিত নয়।",
     workLedger: "কাজের খতিয়ান",
     tryTampering: "⚠ পরিবর্তন করুন (ডেমো)",
-    ledgerEmpty: "খতিয়ান খালি",
-    ledgerEmptyDesc: "খতিয়ানে এখনও কোনো ব্লক লেখা হয়নি। শ্রমিকের উপস্থিতি চেক-ইন প্রথম ব্লক তৈরি করবে।",
+    ledgerEmpty: "এখনও কোনো ব্লক নেই",
+    ledgerEmptyDesc: "অপরিবর্তনীয় খতিয়ান শুরু করতে উপস্থিতি চিহ্নিত করুন।",
   },
 };
 
@@ -204,19 +209,19 @@ function BlockCard({ block }) {
   return (
     <div className="relative chain-drop">
       <div
-        className={`bg-white rounded-xl border-2 ${typeColor} p-3.5 cursor-pointer hover:shadow-md transition-shadow`}
+        className={`bg-white rounded-xl border-2 ${typeColor} p-3.5 cursor-pointer hover:shadow-md hover:scale-[1.005] active:scale-[0.998] transition-all duration-150`}
         onClick={() => setOpen((o) => !o)}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] bg-bitumen text-cement px-1.5 py-0.5 rounded">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-mono text-[10px] bg-bitumen text-cement px-1.5 py-0.5 rounded shrink-0">
               #{block.index}
             </span>
-            <span className="font-display text-[11px] text-bitumen">{typeLabel}</span>
+            <span className="font-display text-[11px] text-bitumen truncate">{typeLabel}</span>
           </div>
-          {open ? <ChevronUp size={14} className="text-steel" /> : <ChevronDown size={14} className="text-steel" />}
+          {open ? <ChevronUp size={14} className="text-steel shrink-0" /> : <ChevronDown size={14} className="text-steel shrink-0" />}
         </div>
-        <p className="text-[11px] text-steel mt-1">
+        <p className="text-[11px] text-steel mt-1 truncate">
           {block.data.workerName || block.data.projectName || "—"} ·{" "}
           {new Date(block.timestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
         </p>
@@ -224,7 +229,7 @@ function BlockCard({ block }) {
           <div className="mt-2.5 pt-2.5 border-t border-bitumen/10 space-y-1 font-mono text-[10px] text-steel break-all">
             <p><span className="text-bitumen/50">prevHash:</span> {block.prevHash.slice(0, 24)}…</p>
             <p><span className="text-bitumen/50">hash:</span> {block.hash.slice(0, 24)}…</p>
-            <pre className="bg-cement rounded-lg p-2 mt-1 whitespace-pre-wrap">
+            <pre className="bg-cement rounded-lg p-2 mt-1 whitespace-pre-wrap text-[9px]">
               {JSON.stringify(block.data, null, 2)}
             </pre>
           </div>
@@ -242,11 +247,11 @@ function DisputeCard({ dispute, onResolve, lang = "en" }) {
   const [note, setNote] = useState("");
   return (
     <div className="bg-rust/5 border border-rust/30 rounded-xl p-4 chain-drop">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="font-mono text-[10px] bg-rust text-white px-1.5 py-0.5 rounded">
+      <div className="flex items-center justify-between mb-1.5 gap-2">
+        <span className="font-mono text-[10px] bg-rust text-white px-1.5 py-0.5 rounded shrink-0">
           {dispute.data.disputeId}
         </span>
-        <span className="text-[11px] text-steel">{dispute.data.workerName}</span>
+        <span className="text-[11px] text-steel truncate">{dispute.data.workerName}</span>
       </div>
       <p className="text-xs text-bitumen mb-3">{dispute.data.reason}</p>
       <input
@@ -258,13 +263,13 @@ function DisputeCard({ dispute, onResolve, lang = "en" }) {
       <div className="flex gap-2">
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Wage released after verification", "WAGE_RELEASED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-tarp text-white text-[11px] font-display py-2 rounded-lg hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 shadow-sm"
+          className="flex-1 flex items-center justify-center gap-1 bg-tarp text-white text-[11px] font-display py-2 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150"
         >
           <CheckCircle2 size={13} /> {t.releaseWageBtn}
         </button>
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Claim rejected after review", "REJECTED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-steel text-white text-[11px] font-display py-2 rounded-lg hover:bg-steel/80 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 shadow-sm"
+          className="flex-1 flex items-center justify-center gap-1 bg-steel text-white text-[11px] font-display py-2 rounded-lg hover:bg-steel/80 hover:shadow-sm hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150"
         >
           <XCircle size={13} /> {t.rejectBtn}
         </button>
@@ -311,10 +316,10 @@ export default function ContractorView({
   return (
     <div className="max-w-2xl mx-auto">
       {/* Actions bar */}
-      <div className="flex items-center justify-between gap-3 mb-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <button
           onClick={() => setShowNewWorker(true)}
-          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shrink-0 shadow-md"
+          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:shadow-lg hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150 shrink-0 shadow-md"
         >
           <Plus size={16} /> {t.addWorker}
         </button>
@@ -337,10 +342,10 @@ export default function ContractorView({
           <button
             key={p.id}
             onClick={() => onSwitchProject(p.id)}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium border whitespace-nowrap ${
+            className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium border whitespace-nowrap transition-all duration-150 ${
               p.id === activeProjectId
-                ? "bg-bitumen text-cement border-bitumen"
-                : "bg-white text-steel border-bitumen/10"
+                ? "bg-bitumen text-cement border-bitumen shadow-md"
+                : "bg-white text-steel border-bitumen/10 hover:border-bitumen/30 hover:text-bitumen hover:shadow-sm active:scale-[0.97]"
             }`}
           >
             {p.name}
@@ -348,30 +353,30 @@ export default function ContractorView({
         ))}
         <button
           onClick={() => setShowNewProject(true)}
-          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-steel/40 text-steel hover:bg-bitumen/5 hover:border-steel/60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center gap-1"
+          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-steel/40 text-steel hover:bg-bitumen/5 hover:border-steel/60 hover:text-bitumen hover:scale-[1.02] active:scale-[0.97] transition-all duration-150 flex items-center gap-1"
         >
           <Plus size={13} /> {t.newSite}
         </button>
       </div>
 
       {showNewProject && (
-        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop">
+        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <p className="font-display text-sm text-bitumen">{t.registerProject}</p>
-            <button onClick={() => setShowNewProject(false)}><X size={16} className="text-steel" /></button>
+            <button onClick={() => setShowNewProject(false)} className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-colors"><X size={16} /></button>
           </div>
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder={t.projectNamePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
           />
           <input
             value={newWage}
             onChange={(e) => setNewWage(e.target.value)}
             type="number"
             placeholder={t.wageTermsPlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
           />
           <button
             disabled={!newName.trim() || !newWage}
@@ -379,7 +384,7 @@ export default function ContractorView({
               onCreateProject(newName.trim(), Number(newWage));
               setNewName(""); setNewWage(""); setShowNewProject(false);
             }}
-            className="w-full bg-safety disabled:opacity-40 text-bitumen text-sm font-display py-3 rounded-lg hover:bg-safetyDark hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md"
+            className="w-full bg-safety disabled:opacity-40 disabled:cursor-not-allowed text-bitumen text-sm font-display py-3 rounded-lg hover:bg-safetyDark hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
           >
             {t.lockWageOnChain}
           </button>
@@ -387,29 +392,29 @@ export default function ContractorView({
       )}
 
       {showNewWorker && (
-        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop">
+        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <p className="font-display text-sm text-bitumen">{t.onboardWorker}</p>
-            <button onClick={() => setShowNewWorker(false)}><X size={16} className="text-steel" /></button>
+            <button onClick={() => setShowNewWorker(false)} className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-colors"><X size={16} /></button>
           </div>
           <input
             value={workerName}
             onChange={(e) => setWorkerName(e.target.value)}
             placeholder={t.workerNamePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
           />
           <input
             value={workerRole}
             onChange={(e) => setWorkerRole(e.target.value)}
             placeholder={t.rolePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
           />
           <input
             value={workerWage}
             onChange={(e) => setWorkerWage(e.target.value)}
             type="number"
             placeholder={t.dailyWagePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety"
+            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
           />
           <p className="text-[11px] text-steel mb-3">
             {t.onboardDesc} <span className="text-bitumen font-medium">{project?.name}</span>{t.onboardDescSuffix}
@@ -420,7 +425,7 @@ export default function ContractorView({
               onAddWorker(workerName.trim(), workerRole.trim(), Number(workerWage), activeProjectId);
               setWorkerName(""); setWorkerRole(""); setWorkerWage(""); setShowNewWorker(false);
             }}
-            className="w-full bg-tarp disabled:opacity-40 text-white text-sm font-display py-3 rounded-lg hover:bg-tarpLight hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md"
+            className="w-full bg-tarp disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-display py-3 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
           >
             {t.issueDigitalId}
           </button>
@@ -428,44 +433,44 @@ export default function ContractorView({
       )}
 
       {/* Stat strip */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
           <div className="flex items-center justify-between mb-2">
             <Users size={16} className="text-steel" />
             <button
               onClick={() => setShowNewWorker(true)}
               title={t.addWorker}
-              className="text-steel hover:text-bitumen"
+              className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded p-0.5 transition-all"
             >
               <Plus size={14} />
             </button>
           </div>
           <p className="font-display text-xl text-bitumen">{projectWorkers.length}</p>
-          <p className="text-[11px] text-steel">{t.activeWorkers}</p>
+          <p className="text-[10px] sm:text-[11px] text-steel">{t.activeWorkers}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
           <Activity size={16} className="text-safety mb-2" />
           <p className="font-display text-xl text-bitumen">{attendanceToday}</p>
-          <p className="text-[11px] text-steel">{t.attendanceMarks}</p>
+          <p className="text-[10px] sm:text-[11px] text-steel">{t.attendanceMarks}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bitumen/10">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
           <IndianRupee size={16} className="text-tarp mb-2" />
           <p className="font-display text-xl text-bitumen">₹{totalPaid}</p>
-          <p className="text-[11px] text-steel">{t.wagesDisbursed}</p>
+          <p className="text-[10px] sm:text-[11px] text-steel">{t.wagesDisbursed}</p>
         </div>
       </div>
 
       {/* Project + chain integrity */}
-      <div className="bg-bitumen text-cement rounded-2xl p-5 mb-6 flex items-center justify-between">
-        <div>
-          <p className="font-display text-sm">{project?.name}</p>
+      <div className="bg-bitumen text-cement rounded-2xl p-4 sm:p-5 mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-display text-sm truncate">{project?.name}</p>
           <p className="text-[11px] text-steel font-mono mt-0.5">
             {chain.length} {t.totalBlocks} · {t.wageLocked} ₹{project?.wageLocked}
           </p>
         </div>
         {chainStatus && (
           <div
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono shrink-0 ${
               chainStatus.valid ? "bg-tarp/20 text-tarpLight" : "bg-rust/20 text-rust"
             }`}
           >
@@ -476,23 +481,35 @@ export default function ContractorView({
       </div>
 
       {/* Active Workers Roster */}
-      <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-5 mb-6 chain-drop">
+      <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-4 sm:p-5 mb-6 chain-drop">
         <h3 className="font-display text-sm text-bitumen mb-3 flex items-center gap-2">
           <Users size={16} /> {t.activeWorkersRoster}
         </h3>
         {projectWorkers.length === 0 ? (
-          <p className="text-xs text-steel py-4 text-center">{t.noWorkersYet}</p>
+          <div className="flex flex-col items-center justify-center py-8 gap-2 text-center">
+            <div className="bg-bitumen/5 p-3 rounded-full">
+              <Users size={20} className="text-steel" />
+            </div>
+            <p className="font-display text-xs text-bitumen">{t.noWorkersYet}</p>
+            <p className="text-[10px] text-steel max-w-[280px]">{t.noWorkersDesc}</p>
+            <button
+              onClick={() => setShowNewWorker(true)}
+              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-tarp border border-tarp/30 rounded-full px-3 py-1.5 hover:bg-tarp/5 hover:border-tarp/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
+            >
+              <Plus size={12} /> {t.addWorker}
+            </button>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto -mx-1">
+            <table className="w-full min-w-[480px] text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
-                  <th className="py-2.5">{t.thWorker}</th>
-                  <th className="py-2.5">{t.thRole}</th>
-                  <th className="py-2.5">{t.thContact}</th>
-                  <th className="py-2.5 text-right">{t.thDailyWage}</th>
-                  <th className="py-2.5 text-right">{t.thDueWage}</th>
-                  <th className="py-2.5 text-right">{t.thPaidWage}</th>
+                  <th className="py-2.5 px-1">{t.thWorker}</th>
+                  <th className="py-2.5 px-1">{t.thRole}</th>
+                  <th className="py-2.5 px-1 hidden sm:table-cell">{t.thContact}</th>
+                  <th className="py-2.5 px-1 text-right">{t.thDailyWage}</th>
+                  <th className="py-2.5 px-1 text-right">{t.thDueWage}</th>
+                  <th className="py-2.5 px-1 text-right">{t.thPaidWage}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-bitumen/5">
@@ -506,17 +523,15 @@ export default function ContractorView({
 
                   return (
                     <tr key={w.id} className="hover:bg-bitumen/[0.02] transition-colors">
-                      <td className="py-3 font-medium text-bitumen">
-                        <div>{w.name}</div>
-                        <div className="font-mono text-[9px] text-steel">{w.id}</div>
+                      <td className="py-3 px-1 font-medium text-bitumen">
+                        <div className="truncate max-w-[100px]">{w.name}</div>
+                        <div className="font-mono text-[9px] text-steel truncate max-w-[100px]">{w.id}</div>
                       </td>
-                      <td className="py-3 text-steel">{w.role}</td>
-                      <td className="py-3 font-mono text-steel">{w.phone || "—"}</td>
-                      <td className="py-3 text-right font-mono text-bitumen">₹{w.dailyWage}</td>
-                      <td className="py-3 text-right font-mono font-medium text-rust">
-                        ₹{dueWage}
-                      </td>
-                      <td className="py-3 text-right font-mono text-tarp">₹{paidWage}</td>
+                      <td className="py-3 px-1 text-steel">{w.role}</td>
+                      <td className="py-3 px-1 font-mono text-steel hidden sm:table-cell">{w.phone || "—"}</td>
+                      <td className="py-3 px-1 text-right font-mono text-bitumen">₹{w.dailyWage}</td>
+                      <td className="py-3 px-1 text-right font-mono font-medium text-rust">₹{dueWage}</td>
+                      <td className="py-3 px-1 text-right font-mono text-tarp">₹{paidWage}</td>
                     </tr>
                   );
                 })}
@@ -552,24 +567,24 @@ export default function ContractorView({
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-bitumen/10 rounded-xl p-5 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-6">
-            <div className="bg-tarp/10 p-2 rounded-full text-tarp">
-              <ShieldCheck size={18} />
+          <div className="bg-white border border-bitumen/10 rounded-xl p-5 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-8">
+            <div className="bg-tarp/10 p-2.5 rounded-full text-tarp">
+              <ShieldCheck size={20} />
             </div>
             <p className="font-display text-xs text-bitumen">{t.noActiveDisputes}</p>
-            <p className="text-[10px] text-steel max-w-[340px]">{t.noDisputesDesc}</p>
+            <p className="text-[10px] text-steel max-w-[300px]">{t.noDisputesDesc}</p>
           </div>
         )}
       </div>
 
       {/* Ledger chain visual */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <p className="font-display text-sm text-bitumen flex items-center gap-1.5">
           <Link2 size={15} /> {t.workLedger}
         </p>
         <button
           onClick={onTamperDemo}
-          className="text-[11px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/5 hover:scale-[1.01] active:scale-[0.99] transition-all"
+          className="text-[11px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/10 hover:border-rust/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
           title="Demo: simulate a contractor trying to edit a past record"
         >
           {t.tryTampering}
@@ -578,12 +593,12 @@ export default function ContractorView({
 
       <div className="space-y-0 max-h-[420px] overflow-y-auto pr-1">
         {chain.length === 0 ? (
-          <div className="bg-white border border-bitumen/10 rounded-xl p-6 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-8">
-            <div className="bg-safety/20 p-2.5 rounded-full text-bitumen">
-              <Activity size={20} className="animate-pulse" />
+          <div className="bg-white border border-bitumen/10 rounded-xl p-6 text-center shadow-sm flex flex-col items-center justify-center gap-2 py-10">
+            <div className="bg-safety/15 p-3 rounded-full text-bitumen">
+              <FileText size={22} className="text-steel" />
             </div>
-            <p className="font-display text-xs text-bitumen">{t.ledgerEmpty}</p>
-            <p className="text-[10px] text-steel max-w-[280px]">{t.ledgerEmptyDesc}</p>
+            <p className="font-display text-sm text-bitumen">{t.ledgerEmpty}</p>
+            <p className="text-[10px] text-steel max-w-[260px] leading-relaxed">{t.ledgerEmptyDesc}</p>
           </div>
         ) : (
           chain.map((block) => (

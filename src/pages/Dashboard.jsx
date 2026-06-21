@@ -425,64 +425,77 @@ export default function Dashboard({ view }) {
 
   return (
     <div className="min-h-screen bg-cement2">
-      <header className="bg-bitumen text-cement sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+      <header className="bg-bitumen text-cement sticky top-0 z-40 shadow-md">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-2">
+          {/* Logo */}
+          <div className="flex items-center gap-2 shrink-0">
             <div className="bg-safety p-1.5 rounded-lg">
               <HardHat size={18} className="text-bitumen" />
             </div>
             <div>
               <p className="font-display text-base leading-none">BuildSafe</p>
-              <p className="text-[10px] text-steel font-mono">Wage protection, on the chain</p>
+              <p className="text-[10px] text-steel font-mono hidden sm:block">Wage protection, on the chain</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Right controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {notionStatus.connected && (
               <a
                 href={notionStatus.workspaceUrl || "https://notion.so"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement border border-steel/30 rounded-full px-2.5 py-1"
+                className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement hover:bg-white/5 border border-steel/30 rounded-full px-2.5 py-1 transition-all duration-150"
               >
                 <ExternalLink size={11} /> Notion
               </a>
             )}
+            {/* Build Log — icon only on mobile */}
             <button
               onClick={() => setShowBuildLog(true)}
-              className="flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement border border-steel/30 rounded-full px-2.5 py-1 hover:scale-[1.01] active:scale-[0.99] transition-all"
+              className="flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement hover:bg-white/5 border border-steel/30 rounded-full px-2 sm:px-2.5 py-1 hover:scale-[1.02] active:scale-[0.96] active:bg-white/10 transition-all duration-150"
+              title="Build Log"
             >
-              <GitBranch size={11} className="text-safety" /> Build Log
+              <GitBranch size={11} className="text-safety" />
+              <span className="hidden sm:inline">Build Log</span>
             </button>
+            {/* Language toggle */}
             <button
               onClick={toggleLang}
               title="Toggle Language / भाषा बदलें"
-              className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/20 text-tarpLight border border-tarp/30 rounded-full px-2.5 py-1 transition-all hover:scale-[1.01] active:scale-[0.99]"
+              className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/25 active:bg-tarp/40 text-tarpLight border border-tarp/30 hover:border-tarp/50 rounded-full px-2 sm:px-2.5 py-1 transition-all duration-150 hover:scale-[1.02] active:scale-[0.96]"
             >
-              <Languages size={11} className="text-safety" /> {LANG_LABELS[lang]}
+              <Languages size={11} className="text-safety" />
+              <span className="hidden xs:inline sm:inline">{LANG_LABELS[lang]}</span>
             </button>
-            <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[120px]">
+            {/* User name — hidden on xs */}
+            <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[100px]">
               {user.name}
             </span>
-            <div className="flex bg-bitumen2 rounded-full p-1 gap-1">
+            {/* Role badge — text hidden on mobile, icon only */}
+            <div className="flex bg-bitumen2 rounded-full p-0.5 sm:p-1">
               {user.role === "worker" ? (
-                <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
-                  <HardHat size={14} /> Worker
+                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
+                  <HardHat size={13} />
+                  <span className="hidden sm:inline">Worker</span>
                 </span>
               ) : user.role === "builder" ? (
-                <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-tarp text-white">
-                  <Landmark size={14} /> Builder
+                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-tarp text-white">
+                  <Landmark size={13} />
+                  <span className="hidden sm:inline">Builder</span>
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
-                  <LayoutDashboard size={14} /> Contractor
+                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
+                  <LayoutDashboard size={13} />
+                  <span className="hidden sm:inline">Contractor</span>
                 </span>
               )}
             </div>
+            {/* Logout */}
             <button
               onClick={handleLogout}
               title="Sign out"
-              className="text-steel hover:text-cement p-1.5"
+              className="text-steel hover:text-cement hover:bg-white/10 active:bg-white/20 p-1.5 rounded-lg transition-all duration-150"
             >
               <LogOut size={16} />
             </button>
@@ -502,7 +515,7 @@ export default function Dashboard({ view }) {
         </div>
       )}
 
-      <main className="px-4 py-8">
+      <main className="px-3 sm:px-4 py-5 sm:py-8">
         {view === "worker" ? (
           <WorkerView
             key={worker?.id}
