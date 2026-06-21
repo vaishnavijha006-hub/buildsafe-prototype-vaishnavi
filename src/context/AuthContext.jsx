@@ -36,6 +36,13 @@ const DEMO_USERS = [
     name: "Amit Verma",
     role: "builder",
   },
+  {
+    id: "usr-regulator-1",
+    email: "audit@buildsafe.in",
+    password: "demo123",
+    name: "Priya Nair",
+    role: "regulator",
+  },
 ];
 
 function loadUsers() {

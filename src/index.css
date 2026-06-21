@@ -5,17 +5,67 @@
 @tailwind utilities;
 
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Inter', sans-serif; }
 
-.rivet {
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #0a0a0a;
+  color: #ffffff;
 }
 
+/* ── Scrollbar ─────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+/* ── Dark surface cards ─────────────────── */
+.ds-card {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+}
+.ds-card-hover {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ds-card-hover:hover {
+  border-color: rgba(16,185,129,0.3);
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.08);
+}
+
+/* ── Stat card pill ──────────────────────── */
+.stat-pill-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(16,185,129,0.12);
+  color: #10b981;
+}
+.stat-pill-down {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+}
+
+/* ── Scan animation ─────────────────────── */
 .scanline {
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(0,0,0,0.025) 0px,
-    rgba(0,0,0,0.025) 1px,
+    rgba(16,185,129,0.04) 0px,
+    rgba(16,185,129,0.04) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -27,65 +77,75 @@ body { margin: 0; font-family: 'Inter', sans-serif; }
 }
 .scan-pulse { animation: scanPulse 1.4s ease-in-out infinite; }
 
+/* ── Chain animation ─────────────────────── */
 @keyframes chainDrop {
   from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.chain-drop { animation: chainDrop 0.4s ease-out; }
+.chain-drop { animation: chainDrop 0.35s ease-out; }
 
-/* Print layout for printable receipt */
+/* ── Bounce short (toast) ───────────────── */
+@keyframes bounceShort {
+  0%   { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+.animate-bounce-short {
+  animation: bounceShort 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Landing fade-up ─────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+.float-y { animation: floatY 3s ease-in-out infinite; }
+
+/* ── Base interactive transitions ───────── */
+button, select, input, textarea, a {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Print receipt ───────────────────────── */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  .receipt-card, .receipt-card * {
-    visibility: visible;
-  }
+  body * { visibility: hidden; }
+  .receipt-card, .receipt-card * { visibility: visible; }
   .receipt-card {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    max-width: 100% !important;
+    left: 0; top: 0;
+    width: 100%; max-width: 100% !important;
     border: none !important;
     background: white !important;
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
   }
-  .no-print {
-    display: none !important;
-  }
+  .no-print { display: none !important; }
 }
 
-/* Short animation for toast alerts */
-@keyframes bounceShort {
-  0% { transform: translateY(12px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-.animate-bounce-short {
-  animation: bounceShort 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* ── Green glow for active elements ─────── */
+.glow-green {
+  box-shadow: 0 0 18px rgba(16,185,129,0.18);
 }
 
-/* Base interactive transitions */
-button, select, input, textarea, a {
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+/* ── Input dark style ───────────────────── */
+.ds-input {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
 }
-
-/* Landing page entrance animation */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+.ds-input::placeholder { color: #71717a; }
+.ds-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16,185,129,0.12);
 }
-.fade-up { animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-up-1 { animation: fadeUp 0.55s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fade-up-2 { animation: fadeUp 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fade-up-3 { animation: fadeUp 0.55s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fade-up-4 { animation: fadeUp 0.55s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-/* Subtle float for hero stat numbers */
-@keyframes floatY {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-4px); }
-}
-.float-y { animation: floatY 4s ease-in-out infinite; }

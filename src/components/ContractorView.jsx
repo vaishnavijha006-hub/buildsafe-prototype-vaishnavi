@@ -188,12 +188,12 @@ const dict = {
 function BlockCard({ block }) {
   const [open, setOpen] = useState(false);
   const typeColorMap = {
-    PAYOUT: "border-tarp",
-    ATTENDANCE: "border-safety",
-    DISPUTE_RAISED: "border-rust",
-    DISPUTE_RESOLVED: "border-steel",
-    PROJECT_CREATED: "border-steel",
-    WORKER_ONBOARDED: "border-tarp",
+    PAYOUT: "border-primary",
+    ATTENDANCE: "border-primary",
+    DISPUTE_RAISED: "border-danger",
+    DISPUTE_RESOLVED: "border-textMuted",
+    PROJECT_CREATED: "border-textMuted",
+    WORKER_ONBOARDED: "border-primary",
   };
   const typeLabelMap = {
     PAYOUT: "WAGE PAYOUT",
@@ -203,40 +203,40 @@ function BlockCard({ block }) {
     PROJECT_CREATED: "PROJECT EVENT",
     WORKER_ONBOARDED: "WORKER ONBOARDED",
   };
-  const typeColor = typeColorMap[block.type] || "border-steel";
+  const typeColor = typeColorMap[block.type] || "border-textMuted";
   const typeLabel = typeLabelMap[block.type] || block.type;
 
   return (
     <div className="relative chain-drop">
       <div
-        className={`bg-white rounded-xl border-2 ${typeColor} p-3.5 cursor-pointer hover:shadow-md hover:scale-[1.005] active:scale-[0.998] transition-all duration-150`}
+        className={`bg-surface rounded-xl border-2 ${typeColor} p-3.5 cursor-pointer hover:bg-surface2 hover:scale-[1.005] active:scale-[0.998] transition-all duration-150`}
         onClick={() => setOpen((o) => !o)}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-mono text-[10px] bg-bitumen text-cement px-1.5 py-0.5 rounded shrink-0">
+            <span className="font-mono text-[10px] bg-white text-dark px-1.5 py-0.5 rounded shrink-0">
               #{block.index}
             </span>
-            <span className="font-display text-[11px] text-bitumen truncate">{typeLabel}</span>
+            <span className="font-display text-[11px] text-white truncate">{typeLabel}</span>
           </div>
-          {open ? <ChevronUp size={14} className="text-steel shrink-0" /> : <ChevronDown size={14} className="text-steel shrink-0" />}
+          {open ? <ChevronUp size={14} className="text-textMuted shrink-0" /> : <ChevronDown size={14} className="text-textMuted shrink-0" />}
         </div>
-        <p className="text-[11px] text-steel mt-1 truncate">
+        <p className="text-[11px] text-textMuted mt-1 truncate">
           {block.data.workerName || block.data.projectName || "—"} ·{" "}
           {new Date(block.timestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
         </p>
         {open && (
-          <div className="mt-2.5 pt-2.5 border-t border-bitumen/10 space-y-1 font-mono text-[10px] text-steel break-all">
-            <p><span className="text-bitumen/50">prevHash:</span> {block.prevHash.slice(0, 24)}…</p>
-            <p><span className="text-bitumen/50">hash:</span> {block.hash.slice(0, 24)}…</p>
-            <pre className="bg-cement rounded-lg p-2 mt-1 whitespace-pre-wrap text-[9px]">
+          <div className="mt-2.5 pt-2.5 border-t border-border space-y-1 font-mono text-[10px] text-textMuted break-all">
+            <p><span className="text-textMuted">prevHash:</span> {block.prevHash.slice(0, 24)}…</p>
+            <p><span className="text-textMuted">hash:</span> {block.hash.slice(0, 24)}…</p>
+            <pre className="bg-surface2 border border-border rounded-lg p-2 mt-1 whitespace-pre-wrap text-[9px] text-white">
               {JSON.stringify(block.data, null, 2)}
             </pre>
           </div>
         )}
       </div>
       <div className="flex justify-center -my-1 relative z-10">
-        <div className="w-px h-4 bg-steel/40" />
+        <div className="w-px h-4 bg-border" />
       </div>
     </div>
   );
@@ -246,30 +246,30 @@ function DisputeCard({ dispute, onResolve, lang = "en" }) {
   const t = dict[lang] || dict.en;
   const [note, setNote] = useState("");
   return (
-    <div className="bg-rust/5 border border-rust/30 rounded-xl p-4 chain-drop">
+    <div className="bg-danger/5 border border-danger/30 rounded-xl p-4 chain-drop">
       <div className="flex items-center justify-between mb-1.5 gap-2">
-        <span className="font-mono text-[10px] bg-rust text-white px-1.5 py-0.5 rounded shrink-0">
+        <span className="font-mono text-[10px] bg-danger text-white px-1.5 py-0.5 rounded shrink-0">
           {dispute.data.disputeId}
         </span>
-        <span className="text-[11px] text-steel truncate">{dispute.data.workerName}</span>
+        <span className="text-[11px] text-textMuted truncate">{dispute.data.workerName}</span>
       </div>
-      <p className="text-xs text-bitumen mb-3">{dispute.data.reason}</p>
+      <p className="text-xs text-white mb-3">{dispute.data.reason}</p>
       <input
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder={t.resolutionPlaceholder}
-        className="w-full text-xs border border-bitumen/15 rounded-lg p-2 mb-2 focus:outline-none focus:border-tarp"
+        className="ds-input mb-2"
       />
       <div className="flex gap-2">
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Wage released after verification", "WAGE_RELEASED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-tarp text-white text-[11px] font-display py-2 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150"
+          className="flex-1 flex items-center justify-center gap-1 bg-primary text-dark text-[11px] font-display py-2 rounded-lg hover:bg-primaryDark transition-all duration-150"
         >
           <CheckCircle2 size={13} /> {t.releaseWageBtn}
         </button>
         <button
           onClick={() => onResolve(dispute.data.disputeId, note || "Claim rejected after review", "REJECTED")}
-          className="flex-1 flex items-center justify-center gap-1 bg-steel text-white text-[11px] font-display py-2 rounded-lg hover:bg-steel/80 hover:shadow-sm hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150"
+          className="flex-1 flex items-center justify-center gap-1 bg-surface3 border border-border text-white text-[11px] font-display py-2 rounded-lg hover:bg-surface2 transition-all duration-150"
         >
           <XCircle size={13} /> {t.rejectBtn}
         </button>
@@ -321,18 +321,18 @@ export default function ContractorView({
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <button
           onClick={() => setShowNewWorker(true)}
-          className="flex items-center gap-2 bg-tarp text-white text-sm font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:shadow-lg hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150 shrink-0 shadow-md"
+          className="flex items-center gap-2 bg-primary text-dark text-sm font-display px-4 py-2.5 rounded-xl hover:bg-primaryDark hover:scale-[1.02] active:scale-[0.97] transition-all duration-150 shrink-0 shadow-md"
         >
           <Plus size={16} /> {t.addWorker}
         </button>
         {syncStatus?.connected ? (
-          <span className="text-[10px] font-mono text-tarp bg-tarp/10 border border-tarp/20 rounded-full px-3 py-1.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-tarp animate-pulse" />
+          <span className="text-[10px] font-mono text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             {t.notionActive}
           </span>
         ) : (
-          <span className="text-[10px] font-mono text-steel bg-bitumen/5 border border-bitumen/10 rounded-full px-3 py-1.5 flex items-center gap-1.5 cursor-help" title="BuildSafe is running in local-first secure offline mode.">
-            <span className="w-1.5 h-1.5 rounded-full bg-steel/60" />
+          <span className="text-[10px] font-mono text-textMuted bg-surface3 border border-border rounded-full px-3 py-1.5 flex items-center gap-1.5 cursor-help" title="BuildSafe is running in local-first secure offline mode.">
+            <span className="w-1.5 h-1.5 rounded-full bg-textMuted" />
             {t.notionOffline}
           </span>
         )}
@@ -346,8 +346,8 @@ export default function ContractorView({
             onClick={() => onSwitchProject(p.id)}
             className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium border whitespace-nowrap transition-all duration-150 ${
               p.id === activeProjectId
-                ? "bg-bitumen text-cement border-bitumen shadow-md"
-                : "bg-white text-steel border-bitumen/10 hover:border-bitumen/30 hover:text-bitumen hover:shadow-sm active:scale-[0.97]"
+                ? "bg-surface2 text-white border-primary shadow-md"
+                : "bg-surface text-textMuted border-border hover:border-primary/50 hover:text-white active:scale-[0.97]"
             }`}
           >
             {p.name}
@@ -355,30 +355,30 @@ export default function ContractorView({
         ))}
         <button
           onClick={() => setShowNewProject(true)}
-          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-steel/40 text-steel hover:bg-bitumen/5 hover:border-steel/60 hover:text-bitumen hover:scale-[1.02] active:scale-[0.97] transition-all duration-150 flex items-center gap-1"
+          className="shrink-0 px-3 py-2 rounded-full text-xs font-medium border border-dashed border-border text-textMuted hover:bg-surface2 hover:border-primary/50 hover:text-white hover:scale-[1.02] active:scale-[0.97] transition-all duration-150 flex items-center gap-1"
         >
           <Plus size={13} /> {t.newSite}
         </button>
       </div>
 
       {showNewProject && (
-        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop shadow-sm">
+        <div className="bg-surface border border-border rounded-2xl p-5 mb-5 chain-drop shadow-sm">
           <div className="flex items-center justify-between mb-3">
-            <p className="font-display text-sm text-bitumen">{t.registerProject}</p>
-            <button onClick={() => setShowNewProject(false)} className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-colors"><X size={16} /></button>
+            <p className="font-display text-sm text-white">{t.registerProject}</p>
+            <button onClick={() => setShowNewProject(false)} className="text-textMuted hover:text-white hover:bg-surface2 rounded-lg p-1 transition-colors"><X size={16} /></button>
           </div>
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder={t.projectNamePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+            className="ds-input mb-2"
           />
           <input
             value={newWage}
             onChange={(e) => setNewWage(e.target.value)}
             type="number"
             placeholder={t.wageTermsPlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+            className="ds-input mb-3"
           />
           <button
             disabled={!newName.trim() || !newWage}
@@ -386,7 +386,7 @@ export default function ContractorView({
               onCreateProject(newName.trim(), Number(newWage));
               setNewName(""); setNewWage(""); setShowNewProject(false);
             }}
-            className="w-full bg-safety disabled:opacity-40 disabled:cursor-not-allowed text-bitumen text-sm font-display py-3 rounded-lg hover:bg-safetyDark hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
+            className="w-full bg-primary disabled:opacity-40 disabled:cursor-not-allowed text-dark text-sm font-display py-3 rounded-lg hover:bg-primaryDark hover:scale-[1.01] active:scale-[0.98] transition-all duration-150 shadow-md"
           >
             {t.lockWageOnChain}
           </button>
@@ -394,38 +394,38 @@ export default function ContractorView({
       )}
 
       {showNewWorker && (
-        <div className="bg-white border-2 border-bitumen/10 rounded-2xl p-5 mb-5 chain-drop shadow-sm">
+        <div className="bg-surface border border-border rounded-2xl p-5 mb-5 chain-drop shadow-sm">
           <div className="flex items-center justify-between mb-3">
-            <p className="font-display text-sm text-bitumen">{t.onboardWorker}</p>
-            <button onClick={() => setShowNewWorker(false)} className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-colors"><X size={16} /></button>
+            <p className="font-display text-sm text-white">{t.onboardWorker}</p>
+            <button onClick={() => setShowNewWorker(false)} className="text-textMuted hover:text-white hover:bg-surface2 rounded-lg p-1 transition-colors"><X size={16} /></button>
           </div>
           <input
             value={workerName}
             onChange={(e) => setWorkerName(e.target.value)}
             placeholder={t.workerNamePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+            className="ds-input mb-2"
           />
           <input
             value={workerRole}
             onChange={(e) => setWorkerRole(e.target.value)}
             placeholder={t.rolePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-2 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+            className="ds-input mb-2"
           />
           <input
             value={workerWage}
             onChange={(e) => setWorkerWage(e.target.value)}
             type="number"
             placeholder={t.dailyWagePlaceholder}
-            className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 mb-3 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+            className="ds-input mb-3"
           />
-          <p className="text-[11px] text-steel mb-3">
-            {t.onboardDesc} <span className="text-bitumen font-medium">{project?.name}</span>{t.onboardDescSuffix}
+          <p className="text-[11px] text-textMuted mb-3">
+            {t.onboardDesc} <span className="text-white font-medium">{project?.name}</span>{t.onboardDescSuffix}
           </p>
 
           {/* Biometric Verification Step */}
           <div className="mb-4">
-            <p className="text-xs font-medium text-bitumen mb-2 flex items-center gap-1.5">
-              <ShieldCheck size={14} className="text-tarp" /> Biometric verification
+            <p className="text-xs font-medium text-white mb-2 flex items-center gap-1.5">
+              <ShieldCheck size={14} className="text-primary" /> Biometric verification
             </p>
             {biometricStatus === "idle" ? (
               <button
@@ -436,22 +436,22 @@ export default function ContractorView({
                     setBiometricSessionId(`BIO-${Math.floor(100000 + Math.random() * 900000)}`);
                   }, 1800);
                 }}
-                className="w-full flex items-center justify-center gap-2 border border-bitumen/15 bg-cement2/30 hover:bg-cement2 hover:border-bitumen/30 text-bitumen text-xs font-display py-2.5 rounded-lg transition-all duration-150"
+                className="w-full flex items-center justify-center gap-2 border border-border bg-surface3 hover:bg-surface2 text-white text-xs font-display py-2.5 rounded-lg transition-all duration-150"
               >
                 <Activity size={14} /> Capture biometric session
               </button>
             ) : biometricStatus === "scanning" ? (
-              <div className="w-full flex flex-col items-center justify-center border border-tarp/30 bg-tarp/5 py-3 rounded-lg scanline relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-tarp opacity-50 scan-pulse" />
-                <Activity size={16} className="text-tarp animate-pulse mb-1" />
-                <span className="text-[10px] font-mono text-tarp">Verifying via ArmorIQ...</span>
+              <div className="w-full flex flex-col items-center justify-center border border-primary/30 bg-primary/5 py-3 rounded-lg scanline relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary opacity-50 scan-pulse" />
+                <Activity size={16} className="text-primary animate-pulse mb-1" />
+                <span className="text-[10px] font-mono text-primary">Verifying via ArmorIQ...</span>
               </div>
             ) : (
-              <div className="w-full flex flex-col items-center justify-center border border-tarp/30 bg-tarp/10 py-2.5 rounded-lg">
-                <div className="flex items-center gap-1.5 text-tarp text-xs font-medium mb-0.5">
+              <div className="w-full flex flex-col items-center justify-center border border-primary/30 bg-primary/10 py-2.5 rounded-lg">
+                <div className="flex items-center gap-1.5 text-primary text-xs font-medium mb-0.5">
                   <CheckCircle2 size={14} /> Biometric session verified · ArmorIQ
                 </div>
-                <span className="text-[9px] font-mono text-tarp/70">Session ID: {biometricSessionId}</span>
+                <span className="text-[9px] font-mono text-primary/70">Session ID: {biometricSessionId}</span>
               </div>
             )}
           </div>
@@ -464,7 +464,7 @@ export default function ContractorView({
               setBiometricStatus("idle"); setBiometricSessionId("");
               setShowNewWorker(false);
             }}
-            className="w-full bg-tarp disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-display py-3 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
+            className="w-full bg-primary disabled:opacity-40 disabled:cursor-not-allowed text-dark text-sm font-display py-3 rounded-lg hover:bg-primaryDark hover:scale-[1.01] active:scale-[0.98] transition-all duration-150 shadow-md"
           >
             {t.issueDigitalId}
           </button>
@@ -473,44 +473,44 @@ export default function ContractorView({
 
       {/* Stat strip */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
+        <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <Users size={16} className="text-steel" />
+            <Users size={16} className="text-textMuted" />
             <button
               onClick={() => setShowNewWorker(true)}
               title={t.addWorker}
-              className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded p-0.5 transition-all"
+              className="text-textMuted hover:text-white hover:bg-surface2 rounded p-0.5 transition-all"
             >
               <Plus size={14} />
             </button>
           </div>
-          <p className="font-display text-xl text-bitumen">{projectWorkers.length}</p>
-          <p className="text-[10px] sm:text-[11px] text-steel">{t.activeWorkers}</p>
+          <p className="font-display text-xl text-white">{projectWorkers.length}</p>
+          <p className="text-[10px] sm:text-[11px] text-textMuted">{t.activeWorkers}</p>
         </div>
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
-          <Activity size={16} className="text-safety mb-2" />
-          <p className="font-display text-xl text-bitumen">{attendanceToday}</p>
-          <p className="text-[10px] sm:text-[11px] text-steel">{t.attendanceMarks}</p>
+        <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 shadow-sm">
+          <Activity size={16} className="text-primary mb-2" />
+          <p className="font-display text-xl text-white">{attendanceToday}</p>
+          <p className="text-[10px] sm:text-[11px] text-textMuted">{t.attendanceMarks}</p>
         </div>
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10">
-          <IndianRupee size={16} className="text-tarp mb-2" />
-          <p className="font-display text-xl text-bitumen">₹{totalPaid}</p>
-          <p className="text-[10px] sm:text-[11px] text-steel">{t.wagesDisbursed}</p>
+        <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 shadow-sm">
+          <IndianRupee size={16} className="text-primary mb-2" />
+          <p className="font-display text-xl text-white">₹{totalPaid}</p>
+          <p className="text-[10px] sm:text-[11px] text-textMuted">{t.wagesDisbursed}</p>
         </div>
       </div>
 
       {/* Project + chain integrity */}
-      <div className="bg-bitumen text-cement rounded-2xl p-4 sm:p-5 mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-surface border border-border rounded-2xl p-4 sm:p-5 mb-6 flex flex-wrap items-center justify-between gap-3 shadow-sm">
         <div className="min-w-0">
-          <p className="font-display text-sm truncate">{project?.name}</p>
-          <p className="text-[11px] text-steel font-mono mt-0.5">
+          <p className="font-display text-sm text-white truncate">{project?.name}</p>
+          <p className="text-[11px] text-textMuted font-mono mt-0.5">
             {chain.length} {t.totalBlocks} · {t.wageLocked} ₹{project?.wageLocked}
           </p>
         </div>
         {chainStatus && (
           <div
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono shrink-0 ${
-              chainStatus.valid ? "bg-tarp/20 text-tarpLight" : "bg-rust/20 text-rust"
+              chainStatus.valid ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"
             }`}
           >
             {chainStatus.valid ? <ShieldCheck size={13} /> : <ShieldAlert size={13} />}
@@ -520,20 +520,20 @@ export default function ContractorView({
       </div>
 
       {/* Active Workers Roster */}
-      <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-4 sm:p-5 mb-6 chain-drop">
-        <h3 className="font-display text-sm text-bitumen mb-3 flex items-center gap-2">
+      <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 mb-6 chain-drop">
+        <h3 className="font-display text-sm text-white mb-3 flex items-center gap-2">
           <Users size={16} /> {t.activeWorkersRoster}
         </h3>
         {projectWorkers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 gap-2 text-center">
-            <div className="bg-bitumen/5 p-3 rounded-full">
-              <Users size={20} className="text-steel" />
+            <div className="bg-surface2 p-3 rounded-full">
+              <Users size={20} className="text-textMuted" />
             </div>
-            <p className="font-display text-xs text-bitumen">{t.noWorkersYet}</p>
-            <p className="text-[10px] text-steel max-w-[280px]">{t.noWorkersDesc}</p>
+            <p className="font-display text-xs text-white">{t.noWorkersYet}</p>
+            <p className="text-[10px] text-textMuted max-w-[280px]">{t.noWorkersDesc}</p>
             <button
               onClick={() => setShowNewWorker(true)}
-              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-tarp border border-tarp/30 rounded-full px-3 py-1.5 hover:bg-tarp/5 hover:border-tarp/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
+              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-primary border border-primary/30 rounded-full px-3 py-1.5 hover:bg-primary/10 hover:border-primary/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
             >
               <Plus size={12} /> {t.addWorker}
             </button>
@@ -542,7 +542,7 @@ export default function ContractorView({
           <div className="overflow-x-auto -mx-1">
             <table className="w-full min-w-[480px] text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
+                <tr className="border-b border-border font-mono text-textMuted text-[10px] uppercase">
                   <th className="py-2.5 px-1">{t.thWorker}</th>
                   <th className="py-2.5 px-1">{t.thRole}</th>
                   <th className="py-2.5 px-1 hidden sm:table-cell">{t.thContact}</th>
@@ -551,7 +551,7 @@ export default function ContractorView({
                   <th className="py-2.5 px-1 text-right">{t.thPaidWage}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-bitumen/5">
+              <tbody className="divide-y divide-border/50">
                 {projectWorkers.map((w) => {
                   const workerEvents = projectChain.filter((b) => b.data.workerId === w.id);
                   const paidWage = workerEvents
@@ -561,16 +561,16 @@ export default function ContractorView({
                   const dueWage = Math.max(0, (attendanceDays * w.dailyWage) - paidWage);
 
                   return (
-                    <tr key={w.id} className="hover:bg-bitumen/[0.02] transition-colors">
-                      <td className="py-3 px-1 font-medium text-bitumen">
+                    <tr key={w.id} className="hover:bg-surface2/50 transition-colors">
+                      <td className="py-3 px-1 font-medium text-white">
                         <div className="truncate max-w-[100px]">{w.name}</div>
-                        <div className="font-mono text-[9px] text-steel truncate max-w-[100px]">{w.id}</div>
+                        <div className="font-mono text-[9px] text-textMuted truncate max-w-[100px]">{w.id}</div>
                       </td>
-                      <td className="py-3 px-1 text-steel">{w.role}</td>
-                      <td className="py-3 px-1 font-mono text-steel hidden sm:table-cell">{w.phone || "—"}</td>
-                      <td className="py-3 px-1 text-right font-mono text-bitumen">₹{w.dailyWage}</td>
-                      <td className="py-3 px-1 text-right font-mono font-medium text-rust">₹{dueWage}</td>
-                      <td className="py-3 px-1 text-right font-mono text-tarp">₹{paidWage}</td>
+                      <td className="py-3 px-1 text-textMuted">{w.role}</td>
+                      <td className="py-3 px-1 font-mono text-textMuted hidden sm:table-cell">{w.phone || "—"}</td>
+                      <td className="py-3 px-1 text-right font-mono text-white">₹{w.dailyWage}</td>
+                      <td className="py-3 px-1 text-right font-mono font-medium text-danger">₹{dueWage}</td>
+                      <td className="py-3 px-1 text-right font-mono text-primary">₹{paidWage}</td>
                     </tr>
                   );
                 })}
@@ -582,12 +582,12 @@ export default function ContractorView({
 
       {/* Anomaly flags */}
       {anomalies.length > 0 && (
-        <div className="bg-rust/10 border border-rust/30 rounded-2xl p-4 mb-6">
-          <p className="font-display text-xs text-rust flex items-center gap-1.5 mb-2">
+        <div className="bg-danger/10 border border-danger/30 rounded-2xl p-4 mb-6">
+          <p className="font-display text-xs text-danger flex items-center gap-1.5 mb-2">
             <AlertTriangle size={14} /> {t.anomalyFlags}
           </p>
           {anomalies.map((a, i) => (
-            <p key={i} className="text-[11px] text-rust/80 font-mono">
+            <p key={i} className="text-[11px] text-danger/80 font-mono">
               Blocks #{a.blocks[0]} &amp; #{a.blocks[1]} — {a.reason}
             </p>
           ))}
@@ -596,8 +596,8 @@ export default function ContractorView({
 
       {/* Open disputes */}
       <div className="mb-6">
-        <p className="font-display text-sm text-bitumen flex items-center gap-1.5 mb-3">
-          <AlertTriangle size={15} className="text-rust" /> {t.openDisputes} ({openDisputes.length})
+        <p className="font-display text-sm text-white flex items-center gap-1.5 mb-3">
+          <AlertTriangle size={15} className="text-danger" /> {t.openDisputes} ({openDisputes.length})
         </p>
         {openDisputes.length > 0 ? (
           <div className="space-y-3">
@@ -606,24 +606,24 @@ export default function ContractorView({
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-bitumen/10 rounded-xl p-5 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-8">
-            <div className="bg-tarp/10 p-2.5 rounded-full text-tarp">
+          <div className="bg-surface border border-border rounded-xl p-5 text-center shadow-sm flex flex-col items-center justify-center gap-1.5 py-8">
+            <div className="bg-primary/10 p-2.5 rounded-full text-primary">
               <ShieldCheck size={20} />
             </div>
-            <p className="font-display text-xs text-bitumen">{t.noActiveDisputes}</p>
-            <p className="text-[10px] text-steel max-w-[300px]">{t.noDisputesDesc}</p>
+            <p className="font-display text-xs text-white">{t.noActiveDisputes}</p>
+            <p className="text-[10px] text-textMuted max-w-[300px]">{t.noDisputesDesc}</p>
           </div>
         )}
       </div>
 
       {/* Ledger chain visual */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <p className="font-display text-sm text-bitumen flex items-center gap-1.5">
+        <p className="font-display text-sm text-white flex items-center gap-1.5">
           <Link2 size={15} /> {t.workLedger}
         </p>
         <button
           onClick={onTamperDemo}
-          className="text-[11px] font-mono text-rust border border-rust/40 rounded-full px-3 py-1 hover:bg-rust/10 hover:border-rust/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
+          className="text-[11px] font-mono text-danger border border-danger/40 rounded-full px-3 py-1 hover:bg-danger/10 hover:border-danger/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
           title="Demo: simulate a contractor trying to edit a past record"
         >
           {t.tryTampering}
@@ -632,12 +632,12 @@ export default function ContractorView({
 
       <div className="space-y-0 max-h-[420px] overflow-y-auto pr-1">
         {chain.length === 0 ? (
-          <div className="bg-white border border-bitumen/10 rounded-xl p-6 text-center shadow-sm flex flex-col items-center justify-center gap-2 py-10">
-            <div className="bg-safety/15 p-3 rounded-full text-bitumen">
-              <FileText size={22} className="text-steel" />
+          <div className="bg-surface border border-border rounded-xl p-6 text-center shadow-sm flex flex-col items-center justify-center gap-2 py-10">
+            <div className="bg-primary/10 p-3 rounded-full text-primary">
+              <FileText size={22} className="text-primary" />
             </div>
-            <p className="font-display text-sm text-bitumen">{t.ledgerEmpty}</p>
-            <p className="text-[10px] text-steel max-w-[260px] leading-relaxed">{t.ledgerEmptyDesc}</p>
+            <p className="font-display text-sm text-white">{t.ledgerEmpty}</p>
+            <p className="text-[10px] text-textMuted max-w-[260px] leading-relaxed">{t.ledgerEmptyDesc}</p>
           </div>
         ) : (
           chain.map((block) => (

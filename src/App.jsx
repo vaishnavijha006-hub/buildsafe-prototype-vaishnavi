@@ -6,12 +6,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 
-/**
- * Root handler:
- *   - Loading  → nothing (avoids flash)
- *   - Logged in → straight to their role dashboard
- *   - Not logged in → Landing page (never /login directly from root)
- */
 function RootRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -48,6 +42,14 @@ export default function App() {
             element={
               <ProtectedRoute role="builder">
                 <Dashboard view="builder" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/regulator"
+            element={
+              <ProtectedRoute role="regulator">
+                <Dashboard view="regulator" />
               </ProtectedRoute>
             }
           />

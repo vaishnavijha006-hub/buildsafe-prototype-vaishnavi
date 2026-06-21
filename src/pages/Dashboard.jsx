@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
-import { HardHat, LayoutDashboard, ShieldCheck, LogOut, ExternalLink, Languages, GitBranch, X, History, Landmark } from "lucide-react";
+import { GitBranch, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import DashboardLayout from "../components/DashboardLayout";
 import WorkerView from "../components/WorkerView";
 import ContractorView from "../components/ContractorView";
 import BuilderView from "../components/BuilderView";
+import RegulatorView from "../components/RegulatorView";
 import ArmorPayGate from "../components/ArmorPayGate";
 import Toast from "../components/Toast";
 import {
@@ -426,137 +428,77 @@ export default function Dashboard({ view }) {
   const openDisputeForWorker = (workerId) => getOpenDisputes(chain).some((d) => d.data.workerId === workerId);
 
   return (
-    <div className="min-h-screen bg-cement2">
-      <header className="bg-bitumen text-cement sticky top-0 z-40 shadow-md">
-        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-2">
-          {/* Logo */}
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="bg-safety p-1.5 rounded-lg">
-              <HardHat size={18} className="text-bitumen" />
-            </div>
-            <div>
-              <p className="font-display text-base leading-none">BuildSafe</p>
-              <p className="text-[10px] text-steel font-mono hidden sm:block">Wage protection, on the chain</p>
-            </div>
-          </div>
-
-          {/* Right controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            {/* Build Log — icon only on mobile */}
-            <button
-              onClick={() => setShowBuildLog(true)}
-              className="flex items-center gap-1 text-[10px] font-mono text-steel hover:text-cement hover:bg-white/5 border border-steel/30 rounded-full px-2 sm:px-2.5 py-1 hover:scale-[1.02] active:scale-[0.96] active:bg-white/10 transition-all duration-150"
-              title="Build Log"
-            >
-              <GitBranch size={11} className="text-safety" />
-              <span className="hidden sm:inline">Build Log</span>
-            </button>
-            {/* Language toggle */}
-            <button
-              onClick={toggleLang}
-              title="Toggle Language / भाषा बदलें"
-              className="flex items-center gap-1 text-[10px] font-mono bg-tarp/10 hover:bg-tarp/25 active:bg-tarp/40 text-tarpLight border border-tarp/30 hover:border-tarp/50 rounded-full px-2 sm:px-2.5 py-1 transition-all duration-150 hover:scale-[1.02] active:scale-[0.96]"
-            >
-              <Languages size={11} className="text-safety" />
-              <span className="hidden xs:inline sm:inline">{LANG_LABELS[lang]}</span>
-            </button>
-            {/* User name — hidden on xs */}
-            <span className="hidden sm:inline text-[11px] text-steel font-mono truncate max-w-[100px]">
-              {user.name}
-            </span>
-            {/* Role badge — text hidden on mobile, icon only */}
-            <div className="flex bg-bitumen2 rounded-full p-0.5 sm:p-1">
-              {user.role === "worker" ? (
-                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
-                  <HardHat size={13} />
-                  <span className="hidden sm:inline">Worker</span>
-                </span>
-              ) : user.role === "builder" ? (
-                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-tarp text-white">
-                  <Landmark size={13} />
-                  <span className="hidden sm:inline">Builder</span>
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs font-medium bg-safety text-bitumen">
-                  <LayoutDashboard size={13} />
-                  <span className="hidden sm:inline">Contractor</span>
-                </span>
-              )}
-            </div>
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              title="Sign out"
-              className="text-steel hover:text-cement hover:bg-white/10 active:bg-white/20 p-1.5 rounded-lg transition-all duration-150"
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <DashboardLayout
+      lang={lang}
+      toggleLang={toggleLang}
+      LANG_LABELS={LANG_LABELS}
+      showBuildLog={showBuildLog}
+      setShowBuildLog={setShowBuildLog}
+    >
+      {/* Sync message banner */}
       {syncMsg && (
-        <div className="bg-tarp/10 border-b border-tarp/20 text-center text-xs font-mono text-tarp py-1.5 chain-drop">
+        <div className="bg-primaryMuted border-b border-primary/20 text-center text-xs font-mono text-primary py-1.5 chain-drop">
           {syncMsg}
         </div>
       )}
 
+      {/* Tamper flash banner */}
       {tamperFlash && (
-        <div className="bg-rust text-white text-center text-xs font-mono py-2 chain-drop">
+        <div className="bg-danger/20 border-b border-danger/30 text-danger text-center text-xs font-mono py-2 chain-drop">
           ⚠ Tamper attempt detected — chain hash mismatch flagged below
         </div>
       )}
 
-      <main className="px-3 sm:px-4 py-5 sm:py-8">
-        {view === "worker" ? (
-          <WorkerView
-            key={worker?.id}
-            worker={worker}
-            workers={workers}
-            project={project}
-            chain={chain}
-            lang={lang}
-            onSwitchWorker={handleSwitchWorker}
-            onScanComplete={handleScanComplete}
-            onClaimWage={handleClaimWage}
-            lastPayout={lastPayout}
-            policyResult={policyResult}
-            onRaiseDispute={handleRaiseDispute}
-            openDisputeForWorker={openDisputeForWorker}
-          />
-        ) : view === "builder" ? (
-          <BuilderView
-            chain={chain}
-            workers={workers}
-            projects={projects}
-            contractors={contractors}
-            onAddContractor={handleAddContractor}
-            syncStatus={syncStatus}
-            lang={lang}
-          />
-        ) : (
-          <ContractorView
-            chain={chain}
-            workers={workers}
-            projects={projects}
-            activeProjectId={activeProjectId}
-            onSwitchProject={setActiveProjectId}
-            onTamperDemo={handleTamperDemo}
-            onResolveDispute={handleResolveDispute}
-            onCreateProject={handleCreateProject}
-            onAddWorker={handleAddWorker}
-            syncStatus={syncStatus}
-            lang={lang}
-          />
-        )}
-      </main>
+      {/* Views */}
+      {view === "worker" ? (
+        <WorkerView
+          key={worker?.id}
+          worker={worker}
+          workers={workers}
+          project={project}
+          chain={chain}
+          lang={lang}
+          onSwitchWorker={handleSwitchWorker}
+          onScanComplete={handleScanComplete}
+          onClaimWage={handleClaimWage}
+          lastPayout={lastPayout}
+          policyResult={policyResult}
+          onRaiseDispute={handleRaiseDispute}
+          openDisputeForWorker={openDisputeForWorker}
+        />
+      ) : view === "builder" ? (
+        <BuilderView
+          chain={chain}
+          workers={workers}
+          projects={projects}
+          contractors={contractors}
+          onAddContractor={handleAddContractor}
+          syncStatus={syncStatus}
+          lang={lang}
+        />
+      ) : view === "regulator" ? (
+        <RegulatorView
+          chain={chain}
+          workers={workers}
+          projects={projects}
+        />
+      ) : (
+        <ContractorView
+          chain={chain}
+          workers={workers}
+          projects={projects}
+          activeProjectId={activeProjectId}
+          onSwitchProject={setActiveProjectId}
+          onTamperDemo={handleTamperDemo}
+          onResolveDispute={handleResolveDispute}
+          onCreateProject={handleCreateProject}
+          onAddWorker={handleAddWorker}
+          syncStatus={syncStatus}
+          lang={lang}
+        />
+      )}
 
-      <footer className="text-center py-6 text-[11px] text-steel font-mono flex items-center justify-center gap-1.5">
-        <ShieldCheck size={12} />
-        Hash-chained ledger · ArmorPay policy-gated payouts
-        {syncStatus.connected && " · Local sync active"}
-      </footer>
-
+      {/* ArmorPay gate */}
       {gateStatus && (
         <ArmorPayGate
           status={gateStatus}
@@ -565,61 +507,50 @@ export default function Dashboard({ view }) {
         />
       )}
 
+      {/* Build Log Modal */}
       {showBuildLog && (
-        <div className="fixed inset-0 bg-bitumen/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 chain-drop shadow-2xl border border-bitumen/10">
-            <div className="flex items-center justify-between border-b border-bitumen/10 pb-3 mb-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-surface rounded-2xl max-w-lg w-full p-6 chain-drop shadow-2xl border border-border">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <div className="flex items-center gap-2">
-                <GitBranch className="text-tarp" size={20} />
-                <h3 className="font-display text-base text-bitumen">BuildSafe Project Iteration Log</h3>
+                <GitBranch className="text-primary" size={18} />
+                <h3 className="font-display text-sm text-white">BuildSafe Iteration Log</h3>
               </div>
-              <button onClick={() => setShowBuildLog(false)} className="text-steel hover:text-bitumen">
+              <button onClick={() => setShowBuildLog(false)} className="text-textMuted hover:text-white">
                 <X size={18} />
               </button>
             </div>
-            
             <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1">
-              <div className="relative pl-6 border-l border-bitumen/10 space-y-4">
-                {/* Release 1.2.0 */}
+              <div className="relative pl-6 border-l border-border space-y-4">
                 <div className="relative">
-                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-safety border-2 border-white ring-2 ring-safety/20" />
-                  <span className="text-[10px] font-mono text-steel block">JUNE 20, 2026</span>
-                  <span className="font-display text-xs text-bitumen block font-bold">v1.2.0 — Localized Access & Receipts (Current)</span>
-                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
-                    Added Hindi bilingual localization for front-line workers. Implemented secure role-based access checks (RBAC) preventing cross-view access. Rendered dynamic SVG-based site check-in QR codes. Created downloadable, printable smart contract payment receipts with cryptographic hashes and ArmorPay stamps. Protected by ArmorIQ biometric session security.
-                  </p>
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-surface ring-2 ring-primary/20" />
+                  <span className="text-[10px] font-mono text-textMuted block">JUNE 21, 2026</span>
+                  <span className="font-display text-xs text-white block font-bold">v1.3.0 — Dark Mode & Gov Audit View (Current)</span>
+                  <p className="text-xs text-textMuted mt-1 leading-relaxed">Complete design system overhaul to dark/emerald theme. Added persistent sidebar layout, Recharts data visualizations, and a read-only Gov Audit / Regulator dashboard with compliance tracking.</p>
                 </div>
-
-                {/* Release 1.1.0 */}
                 <div className="relative">
-                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-tarp border-2 border-white" />
-                  <span className="text-[10px] font-mono text-steel block">JUNE 15, 2026</span>
-                  <span className="font-display text-xs text-bitumen block font-bold">v1.1.0 — ArmorPay Policy Gates</span>
-                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
-                    Integrated automated compliance checks via ArmorPay policy gate (wage bounds, duplicate attendance block velocity bounds, and identity verification checks) before releasing payments.
-                  </p>
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-primary/60 border-2 border-surface" />
+                  <span className="text-[10px] font-mono text-textMuted block">JUNE 20, 2026</span>
+                  <span className="font-display text-xs text-white block font-bold">v1.2.0 — Localized Access & Receipts</span>
+                  <p className="text-xs text-textMuted mt-1 leading-relaxed">Added multilingual support (Hindi, Tamil, Bengali). Implemented RBAC, QR attendance codes, printable wage receipts, and ArmorIQ biometric onboarding verification.</p>
                 </div>
-
-                {/* Release 1.0.0 */}
                 <div className="relative">
-                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-steel border-2 border-white" />
-                  <span className="text-[10px] font-mono text-steel block">JUNE 05, 2026</span>
-                  <span className="font-display text-xs text-bitumen block font-bold">v1.0.0 — Immutable Ledger & Local Storage Sync</span>
-                  <p className="text-xs text-steel mt-1 font-normal leading-relaxed">
-                    Engineered client-side cryptographic ledger chain mimicking Hyperledger Fabric tamper-proof validations. Completed local storage integration for syncing worker profiles and logging real-time ledger blocks.
-                  </p>
+                  <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-surface3 border-2 border-surface" />
+                  <span className="text-[10px] font-mono text-textMuted block">JUNE 05, 2026</span>
+                  <span className="font-display text-xs text-white block font-bold">v1.0.0 — Immutable Ledger & Local Storage Sync</span>
+                  <p className="text-xs text-textMuted mt-1 leading-relaxed">Client-side cryptographic hash-chaining (Hyperledger Fabric pattern). Local storage sync replacing external API dependencies.</p>
                 </div>
               </div>
             </div>
-
-            <div className="mt-5 pt-3 border-t border-bitumen/10 flex items-center justify-between text-[10px] font-mono text-steel">
-              <span>Local Sync Active</span>
-              <span className="text-steel italic">Local Mock Mode</span>
+            <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-[10px] font-mono text-textMuted">
+              <span className="text-primary">Local Sync Active</span>
+              <span className="italic">Hackathon Prototype · Tech Chaos</span>
             </div>
           </div>
         </div>
       )}
 
+      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
@@ -627,6 +558,6 @@ export default function Dashboard({ view }) {
           onClose={() => setToast(null)}
         />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

@@ -91,57 +91,75 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-cement2 flex flex-col">
-      <header className="bg-bitumen text-cement px-4 py-4">
+    <div className="min-h-screen bg-dark flex flex-col">
+      <header className="bg-surface border-b border-border px-4 py-4">
         <div className="max-w-md mx-auto flex items-center gap-2">
-          <div className="bg-safety p-1.5 rounded-lg">
-            <HardHat size={18} className="text-bitumen" />
+          <div className="bg-primary p-1.5 rounded-lg">
+            <HardHat size={18} className="text-dark" />
           </div>
           <div>
-            <p className="font-display text-base leading-none">BuildSafe</p>
-            <p className="text-[10px] text-steel font-mono">Wage protection, on the chain</p>
+            <p className="font-display text-base text-white leading-none">BuildSafe</p>
+            <p className="text-[10px] text-textMuted font-mono">Wage protection, on the chain</p>
           </div>
         </div>
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border-2 border-bitumen/10 p-7 shadow-sm chain-drop">
-            <h1 className="font-display text-xl text-bitumen mb-1">Create account</h1>
-            <p className="text-sm text-steel mb-6">
+          <div className="bg-surface border border-border rounded-2xl p-7 shadow-sm chain-drop">
+            <h1 className="font-display text-xl text-white mb-1">Create account</h1>
+            <p className="text-sm text-textSecondary mb-6">
               Register as a contractor or worker. New accounts sync to your local storage record.
             </p>
 
             {error && (
-              <div className="flex items-center gap-2 bg-rust/10 border border-rust/30 text-rust text-sm rounded-lg px-3 py-2.5 mb-4">
+              <div className="flex items-center gap-2 bg-danger/10 border border-danger/30 text-danger text-sm rounded-lg px-3 py-2.5 mb-4">
                 <AlertCircle size={16} /> {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex gap-4">
+                <label className="flex-1 cursor-pointer">
+                  <input type="radio" name="role" value="contractor" checked={role === "contractor"} onChange={(e) => setRole(e.target.value)} className="peer sr-only" />
+                  <div className="border border-border bg-surface rounded-xl p-3 text-center peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+                    <p className="text-sm font-semibold text-white">Contractor</p>
+                  </div>
+                </label>
+                <label className="flex-1 cursor-pointer">
+                  <input type="radio" name="role" value="worker" checked={role === "worker"} onChange={(e) => setRole(e.target.value)} className="peer sr-only" />
+                  <div className="border border-border bg-surface rounded-xl p-3 text-center peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+                    <p className="text-sm font-semibold text-white">Worker</p>
+                  </div>
+                </label>
+              </div>
+
               <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">Full name</label>
+                <label className="block text-xs font-medium text-white mb-1.5">Full Name</label>
                 <input
+                  type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder="e.g. Ramesh Kumar"
                   required
-                  className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                  className="w-full text-sm border border-border bg-dark rounded-lg p-2.5 focus:outline-none focus:border-primary text-white"
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">Email</label>
+                <label className="block text-xs font-medium text-white mb-1.5">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                  className="w-full text-sm border border-border bg-dark rounded-lg p-2.5 focus:outline-none focus:border-primary text-white"
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">Password</label>
+                <label className="block text-xs font-medium text-white mb-1.5">Password</label>
                 <input
                   type="password"
                   value={password}
@@ -149,41 +167,21 @@ export default function Signup() {
                   placeholder="Min. 6 characters"
                   required
                   minLength={6}
-                  className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                  className="w-full text-sm border border-border bg-dark rounded-lg p-2.5 focus:outline-none focus:border-primary text-white"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">I am a…</label>
-                <div className="flex gap-2">
-                  {["worker", "contractor", "builder"].map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setRole(r)}
-                      className={`flex-1 py-2.5 rounded-lg text-xs font-medium border capitalize ${
-                        role === r
-                          ? "bg-bitumen text-cement border-bitumen"
-                          : "bg-white text-steel border-bitumen/15"
-                      }`}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {role === "worker" && (
-                <div className="space-y-4 border-t border-bitumen/5 pt-4 mt-2">
-                  <p className="text-[11px] font-mono text-steel uppercase tracking-wider">Worker Profile Details</p>
+                <div className="space-y-4 border-t border-border pt-4 mt-2">
+                  <p className="text-[11px] font-mono text-textMuted uppercase tracking-wider">Worker Profile Details</p>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-bitumen mb-1.5">Work Role</label>
+                      <label className="block text-xs font-medium text-white mb-1.5">Work Role</label>
                       <select
                         value={workerRole}
                         onChange={(e) => setWorkerRole(e.target.value)}
-                        className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety bg-white"
+                        className="w-full text-sm border border-border rounded-lg p-2.5 focus:outline-none focus:border-primary bg-dark text-white"
                       >
                         <option value="Mason">Mason</option>
                         <option value="Helper">Helper</option>
@@ -196,7 +194,7 @@ export default function Signup() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-bitumen mb-1.5">Daily Wage (₹)</label>
+                      <label className="block text-xs font-medium text-white mb-1.5">Daily Wage (₹)</label>
                       <input
                         type="number"
                         min="100"
@@ -204,14 +202,14 @@ export default function Signup() {
                         value={dailyWage}
                         onChange={(e) => setDailyWage(e.target.value)}
                         required
-                        className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                        className="w-full text-sm border border-border bg-dark rounded-lg p-2.5 focus:outline-none focus:border-primary text-white"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-bitumen mb-1.5">Phone Number</label>
+                      <label className="block text-xs font-medium text-white mb-1.5">Phone Number</label>
                       <input
                         type="tel"
                         value={phone}
@@ -219,16 +217,16 @@ export default function Signup() {
                         placeholder="10-digit number"
                         required
                         pattern="[0-9]{10}"
-                        className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety"
+                        className="w-full text-sm border border-border bg-dark rounded-lg p-2.5 focus:outline-none focus:border-primary text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-bitumen mb-1.5">Assigned Project</label>
+                      <label className="block text-xs font-medium text-white mb-1.5">Assigned Project</label>
                       <select
                         value={projectId}
                         onChange={(e) => setProjectId(e.target.value)}
-                        className="w-full text-sm border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety bg-white"
+                        className="w-full text-sm border border-border rounded-lg p-2.5 focus:outline-none focus:border-primary bg-dark text-white"
                       >
                         {projects.map((p) => (
                           <option key={p.id} value={p.id}>
@@ -244,15 +242,15 @@ export default function Signup() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 bg-tarp disabled:opacity-50 text-white font-display text-sm py-3 rounded-lg"
+                className="w-full flex items-center justify-center gap-2 bg-primary disabled:opacity-40 disabled:cursor-not-allowed text-dark font-display text-sm py-3 rounded-lg hover:bg-primary/90 transition-all duration-150 mt-2"
               >
-                <UserPlus size={16} /> {submitting ? "Creating account…" : "Create account"}
+                <LogIn size={16} /> {submitting ? "Creating account…" : "Create account"}
               </button>
             </form>
 
-            <p className="text-center text-sm text-steel mt-5">
+            <p className="text-center text-sm text-textSecondary mt-6">
               Already have an account?{" "}
-              <Link to="/login" className="text-tarp font-medium hover:underline">
+              <Link to="/login" className="text-primary font-medium hover:underline">
                 Sign in
               </Link>
             </p>

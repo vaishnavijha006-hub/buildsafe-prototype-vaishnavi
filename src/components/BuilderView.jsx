@@ -250,12 +250,12 @@ export default function BuilderView({
       {/* Action Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg text-bitumen leading-none font-bold">{t.builderOps}</h2>
-          <p className="text-xs text-steel font-mono mt-1">{t.builderSubtitle}</p>
+          <h2 className="font-display text-lg text-white leading-none font-bold">{t.builderOps}</h2>
+          <p className="text-xs text-textMuted font-mono mt-1">{t.builderSubtitle}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-tarp text-white text-xs font-display px-4 py-2.5 rounded-xl hover:bg-tarpLight hover:shadow-lg hover:scale-[1.02] active:scale-[0.97] active:shadow-none transition-all duration-150 shadow-md shrink-0"
+          className="flex items-center gap-2 bg-primary text-dark text-xs font-display px-4 py-2.5 rounded-xl hover:bg-primaryDark hover:scale-[1.02] active:scale-[0.97] transition-all duration-150 shadow-md shrink-0"
         >
           <Plus size={14} /> {t.onboardContractor}
         </button>
@@ -263,35 +263,35 @@ export default function BuilderView({
 
       {/* Stats Grid — 2 cols on mobile, 4 on md+ */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
-          <Landmark size={16} className="text-tarp mb-2" />
-          <p className="font-display text-lg sm:text-xl text-bitumen">₹{totalMasterBudget.toLocaleString("en-IN")}</p>
-          <p className="text-[10px] text-steel">{t.masterBudget}</p>
+        <div className="bg-surface rounded-xl p-3 sm:p-4 border border-border shadow-sm">
+          <Landmark size={16} className="text-primary mb-2" />
+          <p className="font-display text-lg sm:text-xl text-white">₹{totalMasterBudget.toLocaleString("en-IN")}</p>
+          <p className="text-[10px] text-textMuted">{t.masterBudget}</p>
         </div>
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
-          <TrendingUp size={16} className="text-safety mb-2" />
-          <p className="font-display text-lg sm:text-xl text-bitumen">₹{totalAllocated.toLocaleString("en-IN")}</p>
-          <p className="text-[10px] text-steel font-mono">{t.lockedOnChain}</p>
+        <div className="bg-surface rounded-xl p-3 sm:p-4 border border-border shadow-sm">
+          <TrendingUp size={16} className="text-primary mb-2" />
+          <p className="font-display text-lg sm:text-xl text-white">₹{totalAllocated.toLocaleString("en-IN")}</p>
+          <p className="text-[10px] text-textMuted font-mono">{t.lockedOnChain}</p>
         </div>
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
-          <Users size={16} className="text-steel mb-2" />
-          <p className="font-display text-lg sm:text-xl text-bitumen">{workers.length}</p>
-          <p className="text-[10px] text-steel">{t.crewsEnrolled}</p>
+        <div className="bg-surface rounded-xl p-3 sm:p-4 border border-border shadow-sm">
+          <Users size={16} className="text-textMuted mb-2" />
+          <p className="font-display text-lg sm:text-xl text-white">{workers.length}</p>
+          <p className="text-[10px] text-textMuted">{t.crewsEnrolled}</p>
         </div>
-        <div className="bg-white rounded-xl p-3 sm:p-4 border border-bitumen/10 shadow-sm">
-          <Activity size={16} className="text-rust mb-2" />
-          <p className="font-display text-lg sm:text-xl text-bitumen">{anomalies.length}</p>
-          <p className="text-[10px] text-steel">{t.riskAnomalyFlags}</p>
+        <div className="bg-surface rounded-xl p-3 sm:p-4 border border-border shadow-sm">
+          <Activity size={16} className="text-danger mb-2" />
+          <p className="font-display text-lg sm:text-xl text-white">{anomalies.length}</p>
+          <p className="text-[10px] text-textMuted">{t.riskAnomalyFlags}</p>
         </div>
       </div>
 
       {/* Master Wage Budget Drawdown */}
-      <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm space-y-4">
-        <h3 className="font-display text-sm text-bitumen flex items-center gap-2">
-          <Landmark size={16} className="text-tarp" />
+      <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-sm space-y-4">
+        <h3 className="font-display text-sm text-white flex items-center gap-2">
+          <Landmark size={16} className="text-primary" />
           <span>{t.masterWageLock}</span>
         </h3>
-        <div className="space-y-4 divide-y divide-bitumen/5">
+        <div className="space-y-4 divide-y divide-border/50">
           {projects.map((p) => {
             const projectContractor = contractors.find((c) => c.projectId === p.id);
             const budgetMax = projectContractor ? projectContractor.masterBudget : 300000;
@@ -300,19 +300,19 @@ export default function BuilderView({
               <div key={p.id} className="pt-3 first:pt-0 space-y-2">
                 <div className="flex flex-wrap items-start justify-between gap-1 text-xs">
                   <div className="min-w-0">
-                    <span className="font-bold text-bitumen block truncate">{p.name}</span>
-                    <p className="text-[10px] text-steel font-mono">
+                    <span className="font-bold text-white block truncate">{p.name}</span>
+                    <p className="text-[10px] text-textMuted font-mono">
                       {t.contractorLabel}: {projectContractor?.name || t.unassigned}
                     </p>
                   </div>
-                  <span className="font-mono font-semibold text-bitumen text-right shrink-0 text-[11px]">
+                  <span className="font-mono font-semibold text-white text-right shrink-0 text-[11px]">
                     ₹{p.wageLocked.toLocaleString("en-IN")} {t.of} ₹{budgetMax.toLocaleString("en-IN")} {t.locked} ({percent}%)
                   </span>
                 </div>
-                <div className="w-full h-2.5 bg-cement rounded-full overflow-hidden border border-bitumen/5">
+                <div className="w-full h-2.5 bg-surface2 rounded-full overflow-hidden border border-border">
                   <div
                     className={`h-full transition-all duration-700 rounded-full ${
-                      percent > 85 ? "bg-rust" : percent > 50 ? "bg-tarp" : "bg-safety"
+                      percent > 85 ? "bg-danger" : percent > 50 ? "bg-primary/80" : "bg-primary"
                     }`}
                     style={{ width: `${percent}%` }}
                   />
@@ -324,20 +324,20 @@ export default function BuilderView({
       </div>
 
       {/* Multi-Contractor table */}
-      <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm">
-        <h3 className="font-display text-sm text-bitumen mb-3 flex items-center gap-2">
+      <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+        <h3 className="font-display text-sm text-white mb-3 flex items-center gap-2">
           <Users size={16} /> {t.multiContractorOps}
         </h3>
         {contractors.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-            <div className="bg-bitumen/5 p-3 rounded-full">
-              <Users size={22} className="text-steel" />
+            <div className="bg-surface2 p-3 rounded-full">
+              <Users size={22} className="text-textMuted" />
             </div>
-            <p className="font-display text-xs text-bitumen">{t.noContractorsYet}</p>
-            <p className="text-[10px] text-steel max-w-[260px]">{t.noContractorsDesc}</p>
+            <p className="font-display text-xs text-white">{t.noContractorsYet}</p>
+            <p className="text-[10px] text-textMuted max-w-[260px]">{t.noContractorsDesc}</p>
             <button
               onClick={() => setShowForm(true)}
-              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-tarp border border-tarp/30 rounded-full px-3 py-1.5 hover:bg-tarp/5 hover:border-tarp/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
+              className="mt-1 flex items-center gap-1.5 text-[11px] font-display text-primary border border-primary/30 rounded-full px-3 py-1.5 hover:bg-primary/10 hover:border-primary/60 hover:scale-[1.02] active:scale-[0.97] transition-all duration-150"
             >
               <Plus size={12} /> {t.onboardContractor}
             </button>
@@ -346,7 +346,7 @@ export default function BuilderView({
           <div className="overflow-x-auto -mx-1">
             <table className="w-full min-w-[520px] text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-bitumen/10 font-mono text-steel text-[10px] uppercase">
+                <tr className="border-b border-border font-mono text-textMuted text-[10px] uppercase">
                   <th className="py-2.5 px-1">{t.thContractor}</th>
                   <th className="py-2.5 px-1 hidden sm:table-cell">{t.thSiteProject}</th>
                   <th className="py-2.5 px-1 text-center">{t.thActiveWorkers}</th>
@@ -355,7 +355,7 @@ export default function BuilderView({
                   <th className="py-2.5 px-1 text-center">{t.thCompliance}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-bitumen/5">
+              <tbody className="divide-y divide-border/50">
                 {contractors.map((c) => {
                   const proj = projects.find((p) => p.id === c.projectId);
                   const activeWorkers = workers.filter((w) => w.projectId === c.projectId);
@@ -374,24 +374,24 @@ export default function BuilderView({
                     );
                   });
                   return (
-                    <tr key={c.id} className="hover:bg-bitumen/[0.015] transition-colors">
-                      <td className="py-3 px-1 font-semibold text-bitumen">
+                    <tr key={c.id} className="hover:bg-surface2/50 transition-colors">
+                      <td className="py-3 px-1 font-semibold text-white">
                         <div className="truncate max-w-[110px]">{c.name}</div>
-                        <div className="font-mono text-[9px] text-steel truncate max-w-[110px]">{c.email}</div>
+                        <div className="font-mono text-[9px] text-textMuted truncate max-w-[110px]">{c.email}</div>
                       </td>
-                      <td className="py-3 px-1 text-steel hidden sm:table-cell truncate max-w-[120px]">{proj?.name || "—"}</td>
-                      <td className="py-3 px-1 text-center font-mono">{activeWorkers.length}</td>
-                      <td className="py-3 px-1 text-right font-mono font-medium text-tarp">₹{payouts.toLocaleString("en-IN")}</td>
+                      <td className="py-3 px-1 text-textMuted hidden sm:table-cell truncate max-w-[120px]">{proj?.name || "—"}</td>
+                      <td className="py-3 px-1 text-center font-mono text-white">{activeWorkers.length}</td>
+                      <td className="py-3 px-1 text-right font-mono font-medium text-primary">₹{payouts.toLocaleString("en-IN")}</td>
                       <td className="py-3 px-1 text-center">
                         <span className={`font-mono px-2 py-0.5 rounded-full text-[10px] ${
-                          contractorDisputes > 0 ? "bg-rust/10 text-rust font-bold" : "bg-cement text-steel"
+                          contractorDisputes > 0 ? "bg-danger/10 text-danger font-bold" : "bg-surface2 text-textMuted"
                         }`}>
                           {contractorDisputes}
                         </span>
                       </td>
                       <td className="py-3 px-1 text-center">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium font-mono ${
-                          hasAnomalies ? "bg-rust/10 text-rust" : "bg-tarp/10 text-tarp"
+                          hasAnomalies ? "bg-danger/10 text-danger" : "bg-primary/10 text-primary"
                         }`}>
                           {hasAnomalies ? t.anomalyFlagged : t.compliant}
                         </span>
@@ -408,43 +408,43 @@ export default function BuilderView({
       {/* Compliance Rollup & Anomaly Patterns */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Anomaly Pattern Detection */}
-        <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm">
-          <p className="font-display text-xs text-rust flex items-center gap-1.5 mb-3 font-bold">
+        <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <p className="font-display text-xs text-danger flex items-center gap-1.5 mb-3 font-bold">
             <AlertTriangle size={14} /> {t.complianceFraud}
           </p>
           {anomalies.length > 0 ? (
             <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
               {anomalies.map((a, i) => (
-                <div key={i} className="bg-rust/5 border border-rust/15 p-2.5 rounded-lg font-mono text-[10px] text-rust/80 leading-relaxed">
+                <div key={i} className="bg-danger/5 border border-danger/30 p-2.5 rounded-lg font-mono text-[10px] text-danger/80 leading-relaxed">
                   <span className="font-bold block">{t.anomalyFlagLabel} #{i+1} ({t.gpsTimestampCollision})</span>
                   Blocks #{a.blocks[0]} & #{a.blocks[1]} — {a.reason}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="p-6 text-center text-xs text-steel border border-dashed border-bitumen/10 rounded-xl">
-              <CheckCircle2 size={20} className="text-tarp mx-auto mb-2" />
+            <div className="p-6 text-center text-xs text-textMuted border border-dashed border-border rounded-xl">
+              <CheckCircle2 size={20} className="text-primary mx-auto mb-2" />
               <span>{t.noAnomalies}</span>
             </div>
           )}
         </div>
 
         {/* Ledger Integrity summary */}
-        <div className="bg-white rounded-2xl border border-bitumen/10 p-4 sm:p-5 shadow-sm space-y-4">
-          <p className="font-display text-xs text-bitumen flex items-center gap-1.5 font-bold">
-            <Link2 size={14} className="text-tarp" /> {t.cryptoIntegrity}
+        <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-sm space-y-4">
+          <p className="font-display text-xs text-white flex items-center gap-1.5 font-bold">
+            <Link2 size={14} className="text-primary" /> {t.cryptoIntegrity}
           </p>
-          <div className="bg-bitumen text-cement rounded-xl p-4 space-y-3 font-mono text-[10px]">
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <span className="text-steel">{t.chainHealth}</span>
-              <span className="text-safetyLight font-bold">{t.excellent}</span>
+          <div className="bg-surface2 text-dark rounded-xl p-4 space-y-3 font-mono text-[10px]">
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <span className="text-textMuted">{t.chainHealth}</span>
+              <span className="text-primary font-bold">{t.excellent}</span>
             </div>
             <div className="space-y-1">
-              <p>· {t.activeLedgerBlocks} <span className="text-white font-bold">{chain.length} {t.blocksUnit}</span></p>
-              <p>· {t.enrolledContractors} <span className="text-white font-bold">{contractors.length} {t.activeUnit}</span></p>
-              <p>· {t.genesisVerification} <span className="text-safetyLight font-semibold">{t.validated}</span></p>
-              <p>· {t.lastHash}</p>
-              <p className="bg-bitumen2 p-1.5 rounded text-[8px] break-all select-all text-steel leading-tight">
+              <p className="text-textMuted">· {t.activeLedgerBlocks} <span className="text-white font-bold">{chain.length} {t.blocksUnit}</span></p>
+              <p className="text-textMuted">· {t.enrolledContractors} <span className="text-white font-bold">{contractors.length} {t.activeUnit}</span></p>
+              <p className="text-textMuted">· {t.genesisVerification} <span className="text-primary font-semibold">{t.validated}</span></p>
+              <p className="text-textMuted">· {t.lastHash}</p>
+              <p className="bg-surface3 p-1.5 rounded text-[8px] break-all select-all text-textMuted leading-tight">
                 {chain[chain.length - 1]?.hash || t.genesisHashOnly}
               </p>
             </div>
@@ -452,11 +452,11 @@ export default function BuilderView({
           {chainStatus && (
             <div className="flex items-center gap-2 justify-center text-xs font-mono">
               {chainStatus.valid ? (
-                <span className="text-tarp flex items-center gap-1 font-semibold">
+                <span className="text-primary flex items-center gap-1 font-semibold">
                   <ShieldCheck size={14} /> {t.chainValidated}
                 </span>
               ) : (
-                <span className="text-rust flex items-center gap-1 font-bold">
+                <span className="text-danger flex items-center gap-1 font-bold">
                   <AlertTriangle size={14} /> {t.ledgerTampered} #{chainStatus.brokenAt}
                 </span>
               )}
@@ -467,46 +467,46 @@ export default function BuilderView({
 
       {/* Onboard Contractor Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-bitumen/80 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full p-6 shadow-2xl border border-bitumen/10 chain-drop">
-            <div className="flex items-center justify-between border-b border-bitumen/10 pb-3 mb-4">
-              <h3 className="font-display text-sm text-bitumen font-bold">{t.onboardTitle}</h3>
+        <div className="fixed inset-0 bg-dark/80 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm">
+          <div className="bg-surface rounded-t-2xl sm:rounded-2xl max-w-md w-full p-6 shadow-2xl border border-border chain-drop">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h3 className="font-display text-sm text-white font-bold">{t.onboardTitle}</h3>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-steel hover:text-bitumen hover:bg-bitumen/5 rounded-lg p-1 transition-all"
+                className="text-textMuted hover:text-white hover:bg-surface2 rounded-lg p-1 transition-all"
               >
                 <X size={18} />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">{t.contractorName}</label>
+                <label className="block text-xs font-medium text-white mb-1.5">{t.contractorName}</label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t.contractorNamePlaceholder}
                   required
-                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+                  className="ds-input"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-bitumen mb-1.5">{t.emailLabel}</label>
+                <label className="block text-xs font-medium text-white mb-1.5">{t.emailLabel}</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.emailPlaceholder}
                   required
-                  className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+                  className="ds-input"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-bitumen mb-1.5">{t.assignedProject}</label>
+                  <label className="block text-xs font-medium text-white mb-1.5">{t.assignedProject}</label>
                   <select
                     value={projectId}
                     onChange={(e) => setProjectId(e.target.value)}
-                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 bg-white transition-all"
+                    className="ds-input bg-dark"
                   >
                     {projects.map((p) => (
                       <option key={p.id} value={p.id}>{p.name}</option>
@@ -514,23 +514,23 @@ export default function BuilderView({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-bitumen mb-1.5">{t.allocationBudget}</label>
+                  <label className="block text-xs font-medium text-white mb-1.5">{t.allocationBudget}</label>
                   <input
                     type="number"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
                     placeholder={t.budgetPlaceholder}
                     required
-                    className="w-full text-xs border border-bitumen/15 rounded-lg p-2.5 focus:outline-none focus:border-safety focus:ring-1 focus:ring-safety/20 transition-all"
+                    className="ds-input"
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-steel leading-relaxed">
-                {t.onboardDesc} <span className="font-mono font-bold text-bitumen">demo123</span>.
+              <p className="text-[10px] text-textMuted leading-relaxed">
+                {t.onboardDesc} <span className="font-mono font-bold text-white">demo123</span>.
               </p>
               <button
                 type="submit"
-                className="w-full bg-tarp text-white text-xs font-display py-3 rounded-lg hover:bg-tarpLight hover:shadow-md hover:scale-[1.01] active:scale-[0.98] active:shadow-none transition-all duration-150 shadow-md"
+                className="w-full bg-primary text-dark text-xs font-display py-3 rounded-lg hover:bg-primaryDark hover:shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all duration-150 shadow-md"
               >
                 {t.recordOnChain}
               </button>
